@@ -1,13 +1,18 @@
-from dataclasses import dataclass
-from ..enums.color import Color
-from ..enums.pieceType import PieceType
+from enums.color import Color
+from enum import Enum, auto
 
-@dataclass
+class PieceType(Enum):
+    PAWN = auto()
+    KNIGHT = auto()
+    BISHOP = auto()
+    ROOK = auto()
+    QUEEN = auto()
+    KING = auto()
 
 class Piece:
-    color: Color
-    pieceType: PieceType
+    def __init__(self, piece_type: PieceType, color: Color):
+        self.piece_type = piece_type
+        self.color = color
 
-    # generic move function
-
-    # generic symbol function using enum file
+    def __repr__(self):
+        return f"{self.color.name} {self.piece_type.name}"

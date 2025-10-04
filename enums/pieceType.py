@@ -1,9 +1,9 @@
 from enum import Enum
 
 class PieceType(Enum):
-    King = "K"
-    Queen = "Q"
-    Rook = "R"
-    Knight = "N"
-    Bishop = "B"
-    Pawn = "P"
+    KING = "K"
+    QUEEN = "Q"
+    ROOK = "R"
+    KNIGHT = "N"
+    BISHOP = "B"
+    PAWN = "P"
