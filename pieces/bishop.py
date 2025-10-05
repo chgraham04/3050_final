@@ -3,6 +3,8 @@ from piece import Piece
 from ..enums.pieceType import PieceType
 from ..enums.color import Color
 from ..enums.pieceValue import PieceValue
+from ..board.board import Board
+
 
 @dataclass
 class Bishop(Piece):

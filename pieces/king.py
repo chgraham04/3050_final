@@ -41,6 +41,7 @@ class King(Piece):
                 if not tile.has_piece() or tile.is_opposite_color(self.color):
 
                     #TODO: Ensure that cannot be moved into check
+                    #TODO: Implement castling
                     legal_moves.append((check_square[0], check_square[1]))
 
         return legal_moves
