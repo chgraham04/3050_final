@@ -39,7 +39,7 @@ class Pawn(Piece):
 
                 if not tile.has_piece():
                      legal_moves.append(check_square) 
-        
+        3
         #Check for first move
         if (self.has_moved == False):
             check_square = (position[0] + first_move[0], position[1] + first_move[1])
