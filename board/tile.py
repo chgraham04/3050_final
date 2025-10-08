@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 from pieces.piece import Piece
-from ..enums.color import Color
+from enums.color import Color
 
 @dataclass()
 class Tile:
@@ -19,4 +19,4 @@ class Tile:
     def is_other_color(self, color: Color) -> bool:
         return self.piece_here is not None and self.piece_here.color != color
     
-    
+

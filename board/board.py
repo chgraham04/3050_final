@@ -1,6 +1,6 @@
 from typing import List
 from board.tile import Tile
-from pieces.piece import Piece, PieceType, Color
+from pieces.piece import Piece, PieceType, Color, PieceValue
 
 class Board:
     def __init__(self) -> None:
@@ -24,34 +24,34 @@ class Board:
     def initialize_pieces(self):
         # pawns first
         for file in range(8):
-            self.grid[1][file].piece_here = Piece(PieceType.PAWN, Color.WHITE)
-            self.grid[6][file].piece_here = Piece(PieceType.PAWN, Color.BLACK)
+            self.grid[1][file].piece_here = Piece(PieceType.PAWN, Color.WHITE, PieceValue.PAWN, (1, file))
+            self.grid[6][file].piece_here = Piece(PieceType.PAWN, Color.BLACK, PieceValue.PAWN, (6, file))
 
         # kings
-        self.grid[0][4].piece_here = Piece(PieceType.KING, Color.WHITE)
-        self.grid[7][4].piece_here = Piece(PieceType.KING, Color.BLACK)
+        self.grid[0][4].piece_here = Piece(PieceType.KING, Color.WHITE, 1000, (0, 4))
+        self.grid[7][4].piece_here = Piece(PieceType.KING, Color.BLACK, 1000, (7, 4))
 
         # queens
-        self.grid[0][3].piece_here = Piece(PieceType.QUEEN, Color.WHITE)
-        self.grid[7][3].piece_here = Piece(PieceType.QUEEN, Color.BLACK)
+        self.grid[0][3].piece_here = Piece(PieceType.QUEEN, Color.WHITE, PieceValue.QUEEN, (0, 3))
+        self.grid[7][3].piece_here = Piece(PieceType.QUEEN, Color.BLACK, PieceValue.QUEEN, (7, 3))
 
         # rooks
-        self.grid[0][0].piece_here = Piece(PieceType.ROOK, Color.WHITE)
-        self.grid[0][7].piece_here = Piece(PieceType.ROOK, Color.WHITE)
-        self.grid[7][0].piece_here = Piece(PieceType.ROOK, Color.BLACK)
-        self.grid[7][7].piece_here = Piece(PieceType.ROOK, Color.BLACK)
+        self.grid[0][0].piece_here = Piece(PieceType.ROOK, Color.WHITE, PieceValue.ROOK, (0, 0))
+        self.grid[0][7].piece_here = Piece(PieceType.ROOK, Color.WHITE, PieceValue.ROOK, (0, 7))
+        self.grid[7][0].piece_here = Piece(PieceType.ROOK, Color.BLACK, PieceValue.ROOK, (7, 0))
+        self.grid[7][7].piece_here = Piece(PieceType.ROOK, Color.BLACK, PieceValue.ROOK, (7, 7))
 
         # knights
-        self.grid[0][1].piece_here = Piece(PieceType.KNIGHT, Color.WHITE)
-        self.grid[0][6].piece_here = Piece(PieceType.KNIGHT, Color.WHITE)
-        self.grid[7][1].piece_here = Piece(PieceType.KNIGHT, Color.BLACK)
-        self.grid[7][6].piece_here = Piece(PieceType.KNIGHT, Color.BLACK)
+        self.grid[0][1].piece_here = Piece(PieceType.KNIGHT, Color.WHITE, PieceValue.KNIGHT, (0, 1))
+        self.grid[0][6].piece_here = Piece(PieceType.KNIGHT, Color.WHITE, PieceValue.KNIGHT, (0, 6))
+        self.grid[7][1].piece_here = Piece(PieceType.KNIGHT, Color.BLACK, PieceValue.KNIGHT, (7, 1))
+        self.grid[7][6].piece_here = Piece(PieceType.KNIGHT, Color.BLACK, PieceValue.KNIGHT, (7, 6))
 
         # bishops
-        self.grid[0][2].piece_here = Piece(PieceType.BISHOP, Color.WHITE)
-        self.grid[0][5].piece_here = Piece(PieceType.BISHOP, Color.WHITE)
-        self.grid[7][2].piece_here = Piece(PieceType.BISHOP, Color.BLACK)
-        self.grid[7][5].piece_here = Piece(PieceType.BISHOP, Color.BLACK)
+        self.grid[0][2].piece_here = Piece(PieceType.BISHOP, Color.WHITE, PieceValue.BISHOP, (0, 2))
+        self.grid[0][5].piece_here = Piece(PieceType.BISHOP, Color.WHITE, PieceValue.BISHOP, (0, 5))
+        self.grid[7][2].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 2))
+        self.grid[7][5].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 5))
 
     ### JUST FOR TESTING ###
 

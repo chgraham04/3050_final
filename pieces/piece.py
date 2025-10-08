@@ -1,8 +1,6 @@
 from enums.color import Color
 from enum import Enum, auto
 from enums.pieceValue import PieceValue
-from board.board import Board
-
 
 class PieceType(Enum):
     PAWN = auto()
@@ -29,5 +27,5 @@ class Piece:
     def move(self, new_square: tuple[int, int]):
         self.current_pos = new_square
 
-    def get_moves(self, board: Board) -> list[tuple[int, int]]:
+    def get_moves(self, board: "Board") -> list[tuple[int, int]]:
         return []
