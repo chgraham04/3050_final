@@ -14,3 +14,12 @@ class Rook(Piece):
 
     def get_position(self):
         return super().get_position()
+
+    def move(self, new_square: tuple[int, int]):
+        return
+
+    def get_moves(self, board:Board) -> list[tuple[int, int]]:
+        legal_moves = []
+        position = self.current_pos
+
+
