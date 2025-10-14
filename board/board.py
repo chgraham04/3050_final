@@ -8,6 +8,7 @@ class Board:
         # creates 8 lists for each row, each with 8 tile objects
         # initialized to none, replaced by Tile objects later
         self.grid: List[List[Tile]] = [[None for _ in range(8)] for _ in range(8)]
+        self.selected_piece = None
 
         # assign tile objects to None lists
         for rank in range(8):
@@ -52,6 +53,24 @@ class Board:
         self.grid[0][5].piece_here = Piece(PieceType.BISHOP, Color.WHITE, PieceValue.BISHOP, (0, 5))
         self.grid[7][2].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 2))
         self.grid[7][5].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 5))
+
+    def get_piece(self, piece: Piece):
+        self.selected_piece = Piece
+
+    #Calls highlight_move on tiles with legal moves
+    def highlight_moves(self):
+        #ensure a piece is selected
+        if self.selected_piece:
+            legal_moves = self.selected_piece.get_moves(self)
+            for move in legal_moves:
+                self.grid[move[0]][move[1]].highlight_move()
+
+
+    #Removes all highlighted legal moves
+    def remove_highlights(self):
+        for x in range(8):
+            for y in range(8):
+                self.grid[x][y].clear_highlight()
 
     ### JUST FOR TESTING ###
 

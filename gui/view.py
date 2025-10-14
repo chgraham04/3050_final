@@ -7,6 +7,7 @@ from pieces.piece import PieceType, Color as PieceColor
 # light and dark square colors
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ  = (181, 136, 99)
+HIGHLIGHT_SQ = (118, 150, 86)
 
 def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
     # draw 8x8 grid
@@ -21,6 +22,11 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
             top_right = (bottom_left_x + square, bottom_left_y + square)
             # determine if light or dark square
             fill = LIGHT_SQ if tile.is_light_square else DARK_SQ
+
+            #Fill color with highlight if legal moves
+            if (tile.highlighted):
+                fill = HIGHLIGHT_SQ
+
             arcade.draw_lbwh_rectangle_filled(bottom_left_x, bottom_left_y,square, square, fill)
 
 # establish window
