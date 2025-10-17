@@ -9,6 +9,7 @@ class Tile:
     rank: int
     is_light_square: bool
     piece_here: Optional[Piece] = None
+    highlighted: bool = False
 
     def has_piece(self) -> bool:
         return self.piece_here is not None
@@ -18,5 +19,13 @@ class Tile:
     
     def is_other_color(self, color: Color) -> bool:
         return self.piece_here is not None and self.piece_here.color != color
+    
+    def highlight_legal_moves(self):
+        self.highlighted = True
+    
+    def clear_highlight(self):
+        self.highlighted = False
+
+    
     
 
