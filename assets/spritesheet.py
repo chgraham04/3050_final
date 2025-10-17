@@ -1,0 +1,82 @@
+# assets/spritesheet.py
+from __future__ import annotations
+import os
+import arcade
+from typing import Dict, Tuple
+
+PIECE_NAMES = ["king", "queen", "bishop", "knight", "rook", "pawn"]
+COLOR_NAMES = ["white", "black"]
+
+class Spritesheet:
+    """
+    Simplified spritesheet loader for 12 unique PNGs.
+    Loads textures from assets/sprites/ and provides them via get_texture().
+    """
+    def __init__(self, sprites_dir: str = "assets/sprites"):
+        base_dir = os.path.dirname(__file__)
+        self.dir = os.path.normpath(os.path.join(base_dir, "..", sprites_dir))
+        self._textures: Dict[Tuple[str, str], arcade.Texture] = {}
+        self._load_textures()
+
+    def _load_textures(self):
+        for color in COLOR_NAMES:
+            for piece in PIECE_NAMES:
+                filename = f"{color}_{piece}.png"
+                full_path = os.path.join(self.dir, filename)
+                if not os.path.exists(full_path):
+                    raise FileNotFoundError(f"Missing sprite image: {full_path}")
+                tex = arcade.load_texture(full_path)
+                self._textures[(color.upper(), piece.upper())] = tex
+        print(f"[Spritesheet] Loaded {len(self._textures)} piece textures successfully.")
+
+    def get_texture(self, color, piece_type) -> arcade.Texture:
+        """
+        Retrieve the correct texture for a piece.
+        Accepts either Enum objects or strings for color/piece_type.
+        """
+        color_name = getattr(color, "name", str(color)).upper()
+        piece_name = getattr(piece_type, "name", str(piece_type)).upper()
+        return self._textures[(color_name, piece_name)]
+
+
+class ChessSprites:
+    """Manages an Arcade SpriteList for all board pieces."""
+    def __init__(self, sheet: Spritesheet, cell_pixel_width: int):
+        self.sheet = sheet
+        self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
+        self.cell_pixel_width = cell_pixel_width
+        self._by_piece_id: Dict[int, arcade.Sprite] = {}
+
+    @staticmethod
+    def _tile_center(origin_x: int, origin_y: int, square: int, rank: int, file: int) -> tuple[float, float]:
+        return (
+            origin_x + file * square + square / 2,
+            origin_y + rank * square + square / 2,
+        )
+
+    def build_from_board(self, board, square: int, origin_x: int, origin_y: int, pad: float = 0.88):
+        self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
+        self._by_piece_id.clear()
+
+        desired_w = square * pad
+        scale = desired_w / self.cell_pixel_width  # scale against PNG pixel width
+
+        for rank in range(8):
+            for file in range(8):
+                tile = board.grid[rank][file]
+                if not tile.has_piece():
+                    continue
+
+                piece = tile.piece_here
+                tex = self.sheet.get_texture(piece.color, piece.piece_type)
+
+                spr = arcade.Sprite(center_x=0, center_y=0, texture=tex, scale=scale)
+                spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
+                self.sprite_list.append(spr)
+                self._by_piece_id[id(piece)] = spr
+
+    def sync_from_board(self, board, square: int, origin_x: int, origin_y: int):
+        self.build_from_board(board, square, origin_x, origin_y)
+
+    def draw(self):
+        self.sprite_list.draw()
