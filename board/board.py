@@ -1,6 +1,7 @@
 from typing import List
 from board.tile import Tile
 from pieces.piece import Piece, PieceType, Color, PieceValue
+import arcade
 
 class Board:
     def __init__(self) -> None:
@@ -9,6 +10,8 @@ class Board:
         # initialized to none, replaced by Tile objects later
         self.grid: List[List[Tile]] = [[None for _ in range(8)] for _ in range(8)]
         self.selected_piece = None
+        self.held_cards = None
+        self.held_cards_original_pos = None
 
         # assign tile objects to None lists
         for rank in range(8):
@@ -55,7 +58,7 @@ class Board:
         self.grid[7][5].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 5))
 
     def get_piece(self, piece: Piece):
-        self.selected_piece = Piece
+        self.selected_piece = piece
 
     #Calls highlight_move on tiles with legal moves
     def highlight_moves(self):
@@ -96,3 +99,10 @@ class Board:
                     row_str += symbol.upper() + " " if piece.color == Color.WHITE else symbol.lower() + " "
             print(row_str)
         print()
+
+    def on_mouse_release(self, x: float, y:float, button: int, modifiers: int):
+        pass
+
+    def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
+        pass
+

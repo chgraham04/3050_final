@@ -34,7 +34,7 @@ class Bishop(Piece):
                 if not (0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7):
                     break
 
-                tile = board.grid[check_square[0], check_square[1]]
+                tile = board.grid[check_square[0]][check_square[1]]
 
                 if tile is not None:
                     if tile.is_same_color():

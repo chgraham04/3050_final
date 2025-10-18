@@ -1,6 +1,7 @@
 import arcade
 from arcade import color as C
 from board.board import Board
+from enums.color import Color
 from assets.spritesheet import Spritesheet, ChessSprites
 
 LIGHT_SQ = (240, 217, 181)
@@ -36,3 +37,20 @@ class GameView(arcade.View):
         self.clear()
         draw_board(self.board, self.origin_x, self.origin_y, self.square)
         self.sprites.draw()
+    
+    def on_mouse_press(self, x, y, button, key_modifiers):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+
+            file = int((x - self.origin_x) // self.square)
+            rank = int((y - self.origin_y) // self.square)
+
+            if (0 <= file <= 7 and 0 <= rank <= 7):
+                tile = self.board.grid[rank][file]
+
+                if (tile.has_piece() and tile.piece_here.color == Color.WHITE):
+                    self.board.remove_highlights()
+                    self.board.get_piece(tile.piece_here)
+                    self.board.highlight_moves()
+                else:
+                    self.board.selected_piece = None
+                    self.board.remove_highlights()

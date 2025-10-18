@@ -29,3 +29,13 @@ class Piece:
 
     def get_moves(self, board: "Board") -> list[tuple[int, int]]:
         return []
+    
+    def destination_point(self):
+        return self.destination_point
+    
+    def destination_point(self, destination_point):
+        self.destination_point = destination_point
+        self.change_x = 0.0
+        self.change_y = 0.0
+
+    
