@@ -70,7 +70,7 @@ class ChessSprites:
                 piece = tile.piece_here
                 tex = self.sheet.get_texture(piece.color, piece.piece_type)
 
-                spr = arcade.Sprite(center_x=0, center_y=0, texture=tex, scale=scale)
+                spr = arcade.Sprite(tex, scale=scale)
                 spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
                 self.sprite_list.append(spr)
                 self._by_piece_id[id(piece)] = spr
