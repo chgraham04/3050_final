@@ -1,10 +1,8 @@
 from dataclasses import dataclass
-from piece import Piece
-from ..enums.pieceType import PieceType
-from ..enums.color import Color
-from ..enums.pieceValue import PieceValue
-from ..board.board import Board
-
+from pieces.piece import Piece
+from enums.pieceType import PieceType
+from enums.color import Color
+from enums.pieceValue import PieceValue
 
 @dataclass
 class Bishop(Piece):
@@ -14,14 +12,14 @@ class Bishop(Piece):
     def get_position(self):
         return super().get_position()
 
-    def get_moves(self, board: Board) -> list[tuple[int, int]]:
+    def get_moves(self, board) -> list[tuple[int, int]]:
         legal_moves = []
         position = self.current_pos
 
         move_list = [(-1, 1),
                      (1, 1),
                      (-1, -1),
-                     (-1, 1)]
+                     (1, -1)]
 
         for i in range(len(move_list)):
             x_pos, y_pos = move_list[i]
@@ -37,7 +35,7 @@ class Bishop(Piece):
                 tile = board.grid[check_square[0]][check_square[1]]
 
                 if tile is not None:
-                    if tile.is_same_color():
+                    if tile.is_same_color(self.color):
                         break
                     else:
                         legal_moves.append(check_square)

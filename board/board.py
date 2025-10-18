@@ -2,6 +2,12 @@ from typing import List
 from board.tile import Tile
 from pieces.piece import Piece, PieceType, Color, PieceValue
 import arcade
+from pieces.bishop import Bishop
+from pieces.king import King
+from pieces.knight import Knight
+from pieces.pawn import Pawn
+from pieces.queen import Queen
+from pieces.rook import Rook
 
 class Board:
     def __init__(self) -> None:
@@ -26,36 +32,36 @@ class Board:
     # initialize and populate all pieces to starting location on board
     # each corresponding tile is updated with that piece (piece_here)
     def initialize_pieces(self):
-        # pawns first
+        # Pawns
         for file in range(8):
-            self.grid[1][file].piece_here = Piece(PieceType.PAWN, Color.WHITE, PieceValue.PAWN, (1, file))
-            self.grid[6][file].piece_here = Piece(PieceType.PAWN, Color.BLACK, PieceValue.PAWN, (6, file))
+            self.grid[1][file].piece_here = Pawn(Color.WHITE, (file, 1))
+            self.grid[6][file].piece_here = Pawn(Color.BLACK, (file, 6))
 
-        # kings
-        self.grid[0][4].piece_here = Piece(PieceType.KING, Color.WHITE, 1000, (0, 4))
-        self.grid[7][4].piece_here = Piece(PieceType.KING, Color.BLACK, 1000, (7, 4))
+        # Kings
+        self.grid[0][4].piece_here = King(Color.WHITE, (4, 0))
+        self.grid[7][4].piece_here = King(Color.BLACK, (4, 7))
 
-        # queens
-        self.grid[0][3].piece_here = Piece(PieceType.QUEEN, Color.WHITE, PieceValue.QUEEN, (0, 3))
-        self.grid[7][3].piece_here = Piece(PieceType.QUEEN, Color.BLACK, PieceValue.QUEEN, (7, 3))
+        # Queens
+        self.grid[0][3].piece_here = Queen(Color.WHITE, (3, 0))
+        self.grid[7][3].piece_here = Queen(Color.BLACK, (3, 7))
 
-        # rooks
-        self.grid[0][0].piece_here = Piece(PieceType.ROOK, Color.WHITE, PieceValue.ROOK, (0, 0))
-        self.grid[0][7].piece_here = Piece(PieceType.ROOK, Color.WHITE, PieceValue.ROOK, (0, 7))
-        self.grid[7][0].piece_here = Piece(PieceType.ROOK, Color.BLACK, PieceValue.ROOK, (7, 0))
-        self.grid[7][7].piece_here = Piece(PieceType.ROOK, Color.BLACK, PieceValue.ROOK, (7, 7))
+        # Rooks
+        self.grid[0][0].piece_here = Rook(Color.WHITE, (0, 0))
+        self.grid[0][7].piece_here = Rook(Color.WHITE, (7, 0))
+        self.grid[7][0].piece_here = Rook(Color.BLACK, (0, 7))
+        self.grid[7][7].piece_here = Rook(Color.BLACK, (7, 7))
 
-        # knights
-        self.grid[0][1].piece_here = Piece(PieceType.KNIGHT, Color.WHITE, PieceValue.KNIGHT, (0, 1))
-        self.grid[0][6].piece_here = Piece(PieceType.KNIGHT, Color.WHITE, PieceValue.KNIGHT, (0, 6))
-        self.grid[7][1].piece_here = Piece(PieceType.KNIGHT, Color.BLACK, PieceValue.KNIGHT, (7, 1))
-        self.grid[7][6].piece_here = Piece(PieceType.KNIGHT, Color.BLACK, PieceValue.KNIGHT, (7, 6))
+        # Knights
+        self.grid[0][1].piece_here = Knight(Color.WHITE, (1, 0))
+        self.grid[0][6].piece_here = Knight(Color.WHITE, (6, 0))
+        self.grid[7][1].piece_here = Knight(Color.BLACK, (1, 7))
+        self.grid[7][6].piece_here = Knight(Color.BLACK, (6, 7))
 
-        # bishops
-        self.grid[0][2].piece_here = Piece(PieceType.BISHOP, Color.WHITE, PieceValue.BISHOP, (0, 2))
-        self.grid[0][5].piece_here = Piece(PieceType.BISHOP, Color.WHITE, PieceValue.BISHOP, (0, 5))
-        self.grid[7][2].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 2))
-        self.grid[7][5].piece_here = Piece(PieceType.BISHOP, Color.BLACK, PieceValue.BISHOP, (7, 5))
+        # Bishops
+        self.grid[0][2].piece_here = Bishop(Color.WHITE, (2, 0))
+        self.grid[0][5].piece_here = Bishop(Color.WHITE, (5, 0))
+        self.grid[7][2].piece_here = Bishop(Color.BLACK, (2, 7))
+        self.grid[7][5].piece_here = Bishop(Color.BLACK, (5, 7))
 
     def get_piece(self, piece: Piece):
         self.selected_piece = piece

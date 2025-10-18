@@ -6,6 +6,7 @@ from assets.spritesheet import Spritesheet, ChessSprites
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ  = (181, 136, 99)
+HIGHLIGHT_SQ = (118,150,86)
 
 def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
     for rank in range(8):
@@ -13,6 +14,10 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
             x = origin_x + file * square
             y = origin_y + rank * square
             fill = LIGHT_SQ if board.grid[rank][file].is_light_square else DARK_SQ
+
+            if (board.grid[rank][file]).highlighted:
+                fill = HIGHLIGHT_SQ
+            
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
 
 class GameView(arcade.View):
@@ -48,6 +53,7 @@ class GameView(arcade.View):
                 tile = self.board.grid[rank][file]
 
                 if (tile.has_piece() and tile.piece_here.color == Color.WHITE):
+                    print("Piece clicked!")
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()

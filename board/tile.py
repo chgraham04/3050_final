@@ -20,7 +20,7 @@ class Tile:
     def is_other_color(self, color: Color) -> bool:
         return self.piece_here is not None and self.piece_here.color != color
     
-    def highlight_legal_moves(self):
+    def highlight_move(self):
         self.highlighted = True
     
     def clear_highlight(self):

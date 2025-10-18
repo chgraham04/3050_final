@@ -1,10 +1,8 @@
 from dataclasses import dataclass
-from piece import Piece
-from ..enums.pieceType import PieceType
-from ..enums.color import Color
-from ..board.board import Board
-from ..enums.pieceValue import PieceValue
-
+from pieces.piece import Piece
+from enums.pieceType import PieceType
+from enums.color import Color
+from enums.pieceValue import PieceValue
 
 @dataclass
 class King(Piece):
@@ -15,7 +13,7 @@ class King(Piece):
     def get_position(self):
         return super().get_position()
     
-    def get_moves(self, board:Board) -> list[tuple[int, int]]:
+    def get_moves(self, board) -> list[tuple[int, int]]:
         legal_moves = []
         position = self.current_pos
         
