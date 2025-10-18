@@ -26,7 +26,7 @@ class Rook(Piece):
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             while 0 <= nr < 8 and 0 <= nc < 8:
-                tile = board.grid[nr][nc]
+                tile = board.grid[nc][nr]
 
                 if tile.has_piece():
                     # same color blocks, can't land there
@@ -34,11 +34,11 @@ class Rook(Piece):
                         break
                     # enemy piece: can capture, then stop in this direction
                     if tile.is_other_color(self.color):
-                        legal_moves.append((nr, nc))
+                        legal_moves.append((nc, nr))
                         break
                 else:
                     # empty: can move and keep sliding
-                    legal_moves.append((nr, nc))
+                    legal_moves.append((nc, nr))
 
                 nr += dr
                 nc += dc

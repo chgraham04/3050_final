@@ -72,7 +72,7 @@ class Board:
         if self.selected_piece:
             legal_moves = self.selected_piece.get_moves(self)
             for move in legal_moves:
-                self.grid[move[0]][move[1]].highlight_move()
+                self.grid[move[1]][move[0]].highlight_move()
 
 
     #Removes all highlighted legal moves

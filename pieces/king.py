@@ -33,14 +33,14 @@ class King(Piece):
             
             #Ensure square is within bounds and not a friendly piece
             if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
-                tile = board.grid[check_square[0]][check_square[1]]
+                tile = board.grid[check_square[1]][check_square[0]]
 
                 #See what piece is on the board; from tile.py
                 if not tile.has_piece() or tile.is_other_color(self.color):
 
                     #TODO: Ensure that cannot be moved into check
                     #TODO: Implement castling
-                    legal_moves.append((check_square[0], check_square[1]))
+                    legal_moves.append((check_square[1], check_square[0]))
 
         return legal_moves
 
