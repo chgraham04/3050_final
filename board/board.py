@@ -106,6 +106,29 @@ class Board:
             print(row_str)
         print()
 
+    def board_state(self):
+        fen_string = ""
+        for rank in range(7, -1, -1):  # print rank 8 down to 1
+            fen_row = ""
+            empty_count = 0
+            for file in range(8):
+                piece = self.grid[rank][file].piece_here
+                if piece is None:
+                    empty_count += 1
+                    if file == 7:
+                        fen_row = fen_row + str(empty_count)
+                else:
+                    symbol = piece.piece_type.value
+                    if empty_count > 0:
+                        fen_row = fen_row + str(empty_count)
+                        empty_count = 0
+                        fen_row += symbol.upper() if piece.color == Color.WHITE else symbol.lower()
+                    else:
+                        fen_row += symbol.upper() if piece.color == Color.WHITE else symbol.lower()
+            fen_string += (fen_row + "/")
+        print(fen_string)
+        return fen_string
+
     def on_mouse_release(self, x: float, y:float, button: int, modifiers: int):
         pass
 
