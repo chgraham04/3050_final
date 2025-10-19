@@ -15,7 +15,7 @@ def main():
     # board = Board()
     # board.print_board()
     # --- END TESTING --- #
-
+    board.board_state()
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     view = GameView(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     window.show_view(view)
