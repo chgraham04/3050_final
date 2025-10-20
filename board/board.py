@@ -9,6 +9,7 @@ from pieces.pawn import Pawn
 from pieces.queen import Queen
 from pieces.rook import Rook
 
+
 class Board:
     def __init__(self) -> None:
         # nested list format
@@ -100,7 +101,7 @@ class Board:
                 if piece is None:
                     row_str += ". "
                 else:
-                    symbol = piece_symbols[piece.piece_type]
+                    symbol = piece.piece_type.value
                     # uppercase for White, lowercase for Black
                     row_str += symbol.upper() + " " if piece.color == Color.WHITE else symbol.lower() + " "
             print(row_str)
@@ -126,7 +127,7 @@ class Board:
                     else:
                         fen_row += symbol.upper() if piece.color == Color.WHITE else symbol.lower()
             fen_string += (fen_row + "/")
-        print(fen_string)
+        fen_string = fen_string[:-1]
         return fen_string
 
     def on_mouse_release(self, x: float, y:float, button: int, modifiers: int):
