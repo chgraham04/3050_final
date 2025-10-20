@@ -3,10 +3,13 @@ from arcade import color as C
 from board.board import Board
 from enums.color import Color
 from assets.spritesheet import Spritesheet, ChessSprites
+from stockfish import Stockfish
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ  = (181, 136, 99)
 HIGHLIGHT_SQ = (118,150,86)
+
+stockfish = Stockfish(path="C:/Users/Tim Smith/Desktop/fall-2025/CS3050-SoftwareEngineering/stockfish/stockfish-windows-x86-64-avx2.exe")
 
 def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
     for rank in range(8):
@@ -45,18 +48,41 @@ class GameView(arcade.View):
     
     def on_mouse_press(self, x, y, button, key_modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
-
             file = int((x - self.origin_x) // self.square)
             rank = int((y - self.origin_y) // self.square)
 
             if (0 <= file <= 7 and 0 <= rank <= 7):
                 tile = self.board.grid[rank][file]
-
+                legal_moves = []
                 if (tile.has_piece() and tile.piece_here.color == Color.WHITE):
                     print("Piece clicked!")
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()
+
+                elif(tile.highlighted == True):
+                    self.board.remove_highlights()
+                    before_move = self.board.selected_piece.get_position()
+                    before_move_rank = before_move[1]
+                    before_move_file = before_move[0]
+                    self.board.grid[rank][file].piece_here = self.board.selected_piece
+                    # What does this do?
+                    # self.board.selected_piece.move([rank,file])
+                    self.board.grid[before_move_rank][before_move_file].piece_here = None
+                    self.board.selected_piece = None
+                    print(self.board.board_state())
+                    self.board.print_board()
+                    # fen = self.board.board_state() + " b - - 0 8"
+                    # s = stockfish.set_fen_position(fen)
+                    # l = stockfish.get_best_move(s)
+                    
+                    # print(stockfish.is_fen_valid("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"))
+                    # print(l)
+
+                    
+
                 else:
                     self.board.selected_piece = None
                     self.board.remove_highlights()
+            
+
