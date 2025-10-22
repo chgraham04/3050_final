@@ -6,14 +6,10 @@ from assets.spritesheet import Spritesheet, ChessSprites
 from stockfish import Stockfish
 from game.game import Game
 from bot.bot import Bot
-from game.import_stockfish import import_stockfish
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ  = (181, 136, 99)
 HIGHLIGHT_SQ = (118,150,86)
-
-
-stockfish = Stockfish(path=import_stockfish())
 
 def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
     for rank in range(8):

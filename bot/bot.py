@@ -1,10 +1,11 @@
 from enums.color import Color
 from stockfish import Stockfish
-
+from game.import_stockfish import import_stockfish
 
 class Bot:
     def __init__(self) -> None:
-        self.stockfish = Stockfish(path="C:/Users/Tim Smith/Desktop/fall-2025/CS3050-SoftwareEngineering/stockfish/stockfish-windows-x86-64-avx2.exe")
+        self.stockfish = Stockfish(path=import_stockfish())
+
         self.color = Color.BLACK
 
     def next_move(self, fen: str) -> list[tuple[int, int]]:
