@@ -82,6 +82,28 @@ class Board:
             for y in range(8):
                 self.grid[x][y].clear_highlight()
 
+    def get_all_enemy_moves(self):
+
+        #TODO: Change to be adjustable 
+        enemy_color = Color.BLACK
+
+        all_moves = []
+        
+        #Get moves for each piece
+        for rank in range(7, -1, -1):
+            for file in range(8):
+                piece = self.grid[rank][file].piece_here
+                if piece.color is enemy_color:
+                    curr = piece.get_moves
+
+                    for move in curr:
+                        if (not move in all_moves):
+                            all_moves.append(move)
+        
+        return all_moves
+
+
+
     ### JUST FOR TESTING ###
 
     def print_board(self):
