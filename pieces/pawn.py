@@ -21,6 +21,8 @@ class Pawn(Piece):
          self.has_moved = True
          
 
+    #TODO: Implement En Passant
+    #TODO: Implement Promotions
     def get_moves(self, board) -> list[tuple[int, int]]:
         legal_moves = []
         position = self.current_pos

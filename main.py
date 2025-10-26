@@ -11,7 +11,16 @@ from game.game import Game
 
 def main():
     game = Game()
-    game.play_game()
+
+    SCREEN_WIDTH = 850
+    SCREEN_HEIGHT = 850
+    SCREEN_TITLE = "CS3050 Chess"
+
+    #self.board.print_board()
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    view = GameView(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window.show_view(view)
+    arcade.run()
     
 if __name__ == "__main__":
     main() 

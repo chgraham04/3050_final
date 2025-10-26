@@ -21,13 +21,13 @@ class Piece:
     def __repr__(self):
         return f"{self.color.name} {self.piece_type.name}"
     
-    def get_position(self) -> tuple[int, int]:
+    def get_position(self):
         return self.current_pos
     
     def move(self, new_square: tuple[int, int]):
         self.current_pos = new_square
 
-    def get_moves(self, board: "Board") -> list[tuple[int, int]]:
+    def get_moves(self, board: "Board"):
         return []
     
     def destination_point(self):

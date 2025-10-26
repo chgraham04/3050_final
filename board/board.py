@@ -90,7 +90,7 @@ class Board:
         for rank in range(8):
             for file in range(8):
                 piece = self.grid[rank][file].piece_here
-                if piece.color == color:
+                if piece and piece.color == color:
                     curr = piece.get_moves(self)
 
                     for move in curr:

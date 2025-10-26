@@ -55,7 +55,9 @@ class GameView(arcade.View):
 
             if (0 <= file <= 7 and 0 <= rank <= 7):
                 tile = self.board.grid[rank][file]
-                if (tile.has_piece() and tile.piece_here.color == Color.WHITE and self.game.turn == Color.WHITE):
+
+                #TODO: Implement for whichever color's turn it is
+                if (tile.has_piece() and tile.piece_here.color == Color.WHITE):
                     print("Piece clicked!")
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)

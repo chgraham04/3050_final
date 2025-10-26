@@ -28,7 +28,7 @@ class King(Piece):
                      (0, 1), 
                      (0, -1)]
         
-        
+
         for i in range(len(move_list)):
             check_square = (position[0] + move_list[i][0], position[1] + move_list[i][1])
             
@@ -39,7 +39,6 @@ class King(Piece):
                 #See what piece is on the board; from tile.py
                 if not tile.has_piece() or tile.is_other_color(self.color):
 
-                    #TODO: Ensure that cannot be moved into check
                     #TODO: Implement castling
                     legal_moves.append((check_square[1], check_square[0]))
 
