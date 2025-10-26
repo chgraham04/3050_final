@@ -38,4 +38,6 @@ class Piece:
         self.change_x = 0.0
         self.change_y = 0.0
 
+
+
     

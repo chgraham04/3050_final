@@ -71,7 +71,7 @@ class Board:
     def highlight_moves(self):
         #ensure a piece is selected
         if self.selected_piece:
-            legal_moves = self.selected_piece.get_moves(self)
+            legal_moves = self.get_all_legal(self.selected_piece)
             for move in legal_moves:
                 self.grid[move[1]][move[0]].highlight_move()
 
@@ -82,26 +82,88 @@ class Board:
             for y in range(8):
                 self.grid[x][y].clear_highlight()
 
-    def get_all_enemy_moves(self):
-
-        #TODO: Change to be adjustable 
-        enemy_color = Color.BLACK
+    def get_all_enemy_moves(self, color: Color):
 
         all_moves = []
         
         #Get moves for each piece
-        for rank in range(7, -1, -1):
+        for rank in range(8):
             for file in range(8):
                 piece = self.grid[rank][file].piece_here
-                if piece.color is enemy_color:
-                    curr = piece.get_moves
+                if piece.color == color:
+                    curr = piece.get_moves(self)
 
                     for move in curr:
-                        if (not move in all_moves):
+                        if (move not in all_moves):
                             all_moves.append(move)
         
         return all_moves
 
+    #Function finds the player's king
+    def find_king(self, color: Color):
+        for rank in range(8):
+            for file in range(8):
+                piece = self.grid[rank][file].piece_here
+                if piece and piece.color == color and piece.piece_type.name == "KING":
+                    return (file, rank)
+        
+        return None
+    
+    #Function checks whether king is currently in check
+    def check_for_checks(self, color: Color):
+        king_pos = self.find_king(color)
+        if not king_pos:
+            return False
+        
+        if (color == Color.WHITE):
+            enemy_color = Color.BLACK
+        else:
+            enemy_color = Color.WHITE
+        
+        enemy_moves = self.get_all_enemy_moves(enemy_color)
+        if king_pos in enemy_moves:
+            return True
+        else:
+            return False
+        
+    #Function checks to see if moves will put king in check
+    def check_if_move_into_check(self, piece: Piece, new_pos: tuple[int, int]):
+        current_pos = piece.current_pos
+        next_pos = self.grid[new_pos[1]][new_pos[0]]
+
+        #Store piece on target tile
+        captured_piece = next_pos.piece_here
+
+        #Simulate move
+        self.grid[current_pos[1]][current_pos[0]].piece_here = None
+        next_pos.piece_here = piece
+        piece.current_pos = next_pos
+
+        #See if moves into check
+        check = self.check_for_checks(piece.color)
+
+        #Undo move
+        self.grid[current_pos[1]][current_pos[0]].piece_here = piece
+        next_pos.piece_here = captured_piece
+        piece.current_pos = current_pos
+
+        return check
+    
+    #Returns all legal moves that do not put king in check
+    def get_all_legal(self, piece: Piece):
+        check_moves = piece.get_moves(self)
+        legal_moves = []
+
+        for move in check_moves:
+            if not self.check_if_move_into_check(piece, move):
+                legal_moves.append(move)
+
+        return legal_moves
+
+
+
+
+        
 
 
     ### JUST FOR TESTING ###
