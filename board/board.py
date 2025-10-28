@@ -19,6 +19,7 @@ class Board:
         self.selected_piece = None
         self.held_cards = None
         self.held_cards_original_pos = None
+        self.checking_for_checks = False
 
         # assign tile objects to None lists
         for rank in range(8):
@@ -91,7 +92,10 @@ class Board:
             for file in range(8):
                 piece = self.grid[rank][file].piece_here
                 if piece and piece.color == color:
-                    curr = piece.get_moves(self)
+                    if (piece.piece_type == PieceType.KING):
+                        curr = piece.get_moves(self, ignore_checks=True)
+                    else:
+                        curr = piece.get_moves(self)
 
                     for move in curr:
                         if (move not in all_moves):
@@ -111,20 +115,24 @@ class Board:
     
     #Function checks whether king is currently in check
     def check_for_checks(self, color: Color):
-        king_pos = self.find_king(color)
-        if not king_pos:
+        
+        # prevent infinite recursion
+        if self.checking_for_checks:
             return False
         
-        if (color == Color.WHITE):
-            enemy_color = Color.BLACK
-        else:
-            enemy_color = Color.WHITE
+        self.checking_for_checks = True
+
+        try:
+            king_pos = self.find_king(color)
+            if not king_pos:
+                return False
+
+            enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
+            enemy_moves = self.get_all_enemy_moves(enemy_color)
+            return king_pos in enemy_moves
         
-        enemy_moves = self.get_all_enemy_moves(enemy_color)
-        if king_pos in enemy_moves:
-            return True
-        else:
-            return False
+        finally:
+            self.checking_for_checks = False
         
     #Function checks to see if moves will put king in check
     def check_if_move_into_check(self, piece: Piece, new_pos: tuple[int, int]):
@@ -159,6 +167,15 @@ class Board:
                 legal_moves.append(move)
 
         return legal_moves
+    
+    #Checks if a certain tile is under threat of enemy pieces
+    def check_if_danger(self, color: Color, square: tuple[int, int]):
+        enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
+
+        all_moves = self.get_all_enemy_moves(enemy_color)
+        return square in all_moves
+    
+
 
 
 

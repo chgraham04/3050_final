@@ -5,11 +5,19 @@ from enums.color import Color
 from enums.pieceValue import PieceValue
 @dataclass
 class Rook(Piece):
+
+    has_moved: bool = False
+
     def __init__(self, color: Color, start_pos: tuple[int, int]):
         super().__init__(PieceType.ROOK, color, PieceValue.ROOK, start_pos)
 
     def get_position(self):
         return super().get_position()
+    
+    def move(self, new_square: tuple[int, int]):
+        self.current_pos = new_square
+        self.has_moved = True
+         
 
     def get_moves(self, board) -> list[tuple[int, int]]:
         legal_moves: list[tuple[int, int]] = []
