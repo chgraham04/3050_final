@@ -20,6 +20,7 @@ class Board:
         self.held_cards = None
         self.held_cards_original_pos = None
         self.checking_for_checks = False
+        self.en_passant_target = None
 
         # assign tile objects to None lists
         for rank in range(8):
@@ -64,6 +65,15 @@ class Board:
         self.grid[0][5].piece_here = Bishop(Color.WHITE, (5, 0))
         self.grid[7][2].piece_here = Bishop(Color.BLACK, (2, 7))
         self.grid[7][5].piece_here = Bishop(Color.BLACK, (5, 7))
+
+    def move(self, piece: Piece, new_pos: tuple[int, int]):
+
+        #TODO: MAIN MOVEMENT CODE
+
+        #Deals with en passant
+        if (piece.piece_type == PieceType.PAWN):
+            self.en_passant(piece, new_pos)
+
 
     def get_piece(self, piece: Piece):
         self.selected_piece = piece
@@ -174,6 +184,28 @@ class Board:
 
         all_moves = self.get_all_enemy_moves(enemy_color)
         return square in all_moves
+    
+    #Function handles en passant checking and capturing
+    def en_passant(self, piece: Pawn, new_pos: tuple[int, int]):
+        prev_pos = piece.current_pos
+
+        if self.en_passant_target and new_pos == self.en_passant_target:
+                
+            if piece.color == Color.WHITE:
+                check_square = (new_pos[0], new_pos[1] - 1)
+            else:
+                check_square = (new_pos[0], new_pos[1] + 1)
+            
+            self.grid[check_square[1]][check_square[0]].piece_here = None
+        
+        self.grid[prev_pos[1]][prev_pos[0]].piece_here = None
+        self.grid[new_pos[1]][new_pos[0]].piece_here = piece
+        piece.current_pos = new_pos
+        piece.has_moved = True
+    
+        self.en_passant_target = None
+
+
     
 
 
