@@ -12,8 +12,10 @@ from game.game import Game
 def main():
     game = Game()
 
-    SCREEN_WIDTH = 850
+    BOARD_PIXELS = 850
     SCREEN_HEIGHT = 850
+    SIDEBAR_WIDTH = 260
+    SCREEN_WIDTH = BOARD_PIXELS + SIDEBAR_WIDTH
     SCREEN_TITLE = "CS3050 Chess"
 
     #self.board.print_board()
