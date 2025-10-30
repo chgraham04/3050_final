@@ -66,13 +66,18 @@ class Board:
         self.grid[7][2].piece_here = Bishop(Color.BLACK, (2, 7))
         self.grid[7][5].piece_here = Bishop(Color.BLACK, (5, 7))
 
-    def move(self, piece: Piece, new_pos: tuple[int, int]):
-
-        #TODO: MAIN MOVEMENT CODE
-
+    def move_piece(self, rank, file):
+        before_move = self.selected_piece.get_position()
+        before_move_rank = before_move[1]
+        before_move_file = before_move[0]
+        self.grid[rank][file].piece_here = self.selected_piece
+        # What does this do?
+        # self.board.selected_piece.move([rank,file])
+        self.grid[before_move_rank][before_move_file].piece_here = None
+        self.selected_piece = None
         #Deals with en passant
-        if (piece.piece_type == PieceType.PAWN):
-            self.en_passant(piece, new_pos)
+        # if (piece.piece_type == PieceType.PAWN):
+        #     self.en_passant(piece, new_pos)
 
 
     def get_piece(self, piece: Piece):

@@ -89,7 +89,7 @@ class GameView(arcade.View):
                 elif (tile.highlighted == True):
                     self.board.remove_highlights()
                     # new funciton in board
-                    self.board.move_piece(rank, file, self.board.selected_piece)
+                    self.board.move_piece(rank, file)
 
                     self.board.print_board()
 
@@ -99,7 +99,7 @@ class GameView(arcade.View):
 
                     self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
 
-                    self.board.move_piece(bot_moves[1][0], bot_moves[1][1], self.board.selected_piece)
+                    self.board.move_piece(bot_moves[1][0], bot_moves[1][1])
 
                     self.game.turn = Color.WHITE
 
