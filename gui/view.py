@@ -8,8 +8,10 @@ from game.game import Game
 from bot.bot import Bot
 
 LIGHT_SQ = (240, 217, 181)
-DARK_SQ  = (181, 136, 99)
-HIGHLIGHT_SQ = (118,150,86)
+DARK_SQ = (181, 136, 99)
+HIGHLIGHT_SQ = (118, 150, 86)
+SIDEPANEL_BG = (50, 50, 50)
+
 
 def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
     for rank in range(8):
@@ -20,8 +22,23 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
 
             if (board.grid[rank][file]).highlighted:
                 fill = HIGHLIGHT_SQ
-            
+
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
+
+
+def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game):
+    # Background
+    arcade.draw_lbwh_rectangle_filled(x, y, width, height, SIDEPANEL_BG)
+
+    # Title
+    arcade.draw_text("BLAHBLAHBLAH", x + width // 2, y + height - 40,
+                     C.WHITE, 20, anchor_x="center", bold=True)
+
+    # Current turn
+    turn_text = "White's Turn" if game.turn == Color.WHITE else "Black's Turn"
+    arcade.draw_text(turn_text, x + width // 2, y + height - 80,
+                     C.WHITE, 16, anchor_x="center")
+
 
 class GameView(arcade.View):
     def __init__(self, width: int, height: int, title: str):
@@ -31,11 +48,12 @@ class GameView(arcade.View):
         self.board = Board()
         self.game = Game()
         self.bot = Bot()
-        self.square  = width // 8
-        self.origin_x = (width  - self.square * 8) // 2
+        self.square = 850 // 8
+        self.origin_x = 0
         self.origin_y = (height - self.square * 8) // 2
+        self.sidepanel_x = 850
+        self.sidepanel_width = width - 850
 
-        # Set this to the pixel width of your PNGs (e.g., 256 if your images are 256x256)
         CELL_PIXEL_WIDTH = 256
 
         # Loader + sprites from assets/spritesheet.py
@@ -47,7 +65,9 @@ class GameView(arcade.View):
         self.clear()
         draw_board(self.board, self.origin_x, self.origin_y, self.square)
         self.sprites.draw()
-    
+        draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
+                       self.window.height, self.game)
+
     def on_mouse_press(self, x, y, button, key_modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             file = int((x - self.origin_x) // self.square)
@@ -56,19 +76,19 @@ class GameView(arcade.View):
             if (0 <= file <= 7 and 0 <= rank <= 7):
                 tile = self.board.grid[rank][file]
 
-                #TODO: Implement for whichever color's turn it is
+                # TODO: Implement for whichever color's turn it is
                 if (tile.has_piece() and tile.piece_here.color == Color.WHITE):
                     print("Piece clicked!")
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()
 
-                elif(self.game.turn == Color.BLACK):
+                elif (self.game.turn == Color.BLACK):
                     print("Not your turn")
 
-                elif(tile.highlighted == True):
+                elif (tile.highlighted == True):
                     self.board.remove_highlights()
-                    #new funciton in board
+                    # new funciton in board
                     self.board.move_piece(rank, file, self.board.selected_piece)
 
                     self.board.print_board()
@@ -76,16 +96,13 @@ class GameView(arcade.View):
                     self.game.turn = Color.BLACK
 
                     bot_moves = self.bot.next_move(fen=self.board.board_state())
-                    
+
                     self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
 
                     self.board.move_piece(bot_moves[1][0], bot_moves[1][1], self.board.selected_piece)
 
                     self.game.turn = Color.WHITE
-                    
+
                 else:
                     self.board.selected_piece = None
                     self.board.remove_highlights()
-
-            
-
