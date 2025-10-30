@@ -70,7 +70,7 @@ class GameView(arcade.View):
                     self.board.remove_highlights()
                     #new funciton in board
                     self.board.move_piece(rank, file, self.board.selected_piece)
-                    
+
                     self.board.print_board()
 
                     self.game.turn = Color.BLACK
