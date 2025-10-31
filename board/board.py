@@ -17,8 +17,6 @@ class Board:
         # initialized to none, replaced by Tile objects later
         self.grid: List[List[Tile]] = [[None for _ in range(8)] for _ in range(8)]
         self.selected_piece = None
-        self.held_cards = None
-        self.held_cards_original_pos = None
         self.checking_for_checks = False
         self.en_passant_target = None
 
@@ -66,13 +64,14 @@ class Board:
         self.grid[7][2].piece_here = Bishop(Color.BLACK, (2, 7))
         self.grid[7][5].piece_here = Bishop(Color.BLACK, (5, 7))
 
-    def move_piece(self, rank, file):
+    def move_piece(self, file, rank):
         before_move = self.selected_piece.get_position()
         before_move_rank = before_move[1]
         before_move_file = before_move[0]
+        self.selected_piece.move((file, rank), self)
+
         self.grid[rank][file].piece_here = self.selected_piece
         # What does this do?
-        self.selected_piece.move((rank, file), self)
         self.grid[before_move_rank][before_move_file].piece_here = None
         piece = self.selected_piece
         print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")
@@ -99,9 +98,9 @@ class Board:
 
     #Removes all highlighted legal moves
     def remove_highlights(self):
-        for x in range(8):
-            for y in range(8):
-                self.grid[x][y].clear_highlight()
+        for rank in range(8):
+            for file in range(8):
+                self.grid[rank][file].clear_highlight()
 
     def get_all_enemy_moves(self, color: Color):
 
@@ -111,7 +110,7 @@ class Board:
         for rank in range(8):
             for file in range(8):
                 piece = self.grid[rank][file].piece_here
-                if piece and piece.color == color:
+                if piece and piece.color != color:
                     if (piece.piece_type == PieceType.KING):
                         curr = piece.get_moves(self, ignore_checks=True)
                     else:

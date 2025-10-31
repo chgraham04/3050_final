@@ -21,6 +21,7 @@ class Pawn(Piece):
         old_x, old_y = self.current_pos
         new_x, new_y = new_square
         self.has_moved = True
+        self.current_pos = new_square
 
         #Check for moving forwards twice (for en passant)
         if abs(new_y - old_y) == 2:

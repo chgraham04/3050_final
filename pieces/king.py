@@ -16,7 +16,7 @@ class King(Piece):
     def get_position(self):
         return super().get_position()
     
-    def move(self, new_square: tuple[int, int]):
+    def move(self, new_square: tuple[int, int], board: "Board"):
         self.current_pos = new_square
         self.has_moved = True
          
@@ -48,7 +48,7 @@ class King(Piece):
                 #See what piece is on the board; from tile.py
                 if not tile.has_piece() or tile.is_other_color(self.color):
 
-                    legal_moves.append((check_square[1], check_square[0]))
+                    legal_moves.append((check_square[0], check_square[1]))
 
         #Skips checking for castling if ignore checks turned on - prevents recursion
         if ignore_checks:

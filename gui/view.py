@@ -105,7 +105,7 @@ class GameView(arcade.View):
                 elif (tile.highlighted == True):
                     self.board.remove_highlights()
                     # new function in board
-                    self.board.move_piece_and_update_sprites(rank, file)
+                    self.board.move_piece_and_update_sprites(file, rank)
                     self.board.print_board()
 
                     self.game.turn = Color.BLACK
@@ -148,9 +148,9 @@ class GameView(arcade.View):
                 return sprite
         return None
 
-    def move_piece_and_update_sprites(self, rank, file):
+    def move_piece_and_update_sprites(self, file, rank):
         # Move piece on board and update sprite positions
-        self.board.move_piece(rank, file)
+        self.board.move_piece(file, rank)
 
         # Rebuild sprites to show new board state
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
@@ -189,7 +189,7 @@ class GameView(arcade.View):
                 if tile.highlighted:
                     # Valid move
                     self.board.remove_highlights()
-                    self.move_piece_and_update_sprites(rank, file)
+                    self.move_piece_and_update_sprites(file, rank)
                 else:
                     orig_file, orig_rank = self.drag_start_pos
                     self.dragging_sprite.center_x, self.dragging_sprite.center_y = self.sprites._tile_center(self.origin_x, self.origin_y, self.square, orig_rank, orig_file)

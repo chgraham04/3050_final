@@ -14,41 +14,43 @@ class Rook(Piece):
     def get_position(self):
         return super().get_position()
     
-    def move(self, new_square: tuple[int, int]):
+    def move(self, new_square: tuple[int, int], board: "Board"):
         self.current_pos = new_square
         self.has_moved = True
          
 
     def get_moves(self, board) -> list[tuple[int, int]]:
-        legal_moves: list[tuple[int, int]] = []
-        r, c = self.current_pos  # (rank, file)
+        legal_moves = []
+        position = self.current_pos
 
-        # 4 sliding directions for a rook (rank/file)
-        directions = [
-            (1, 0),   # down (toward higher ranks)
-            (-1, 0),  # up   (toward lower ranks)
-            (0, 1),   # right (higher files)
-            (0, -1),  # left  (lower files)
-        ]
+        move_list = [(-1, 0),
+                     (1, 0),
+                     (0, -1),
+                     (0, 1)]
 
-        for dr, dc in directions:
-            nr, nc = r + dr, c + dc
-            while 0 <= nr < 8 and 0 <= nc < 8:
-                tile = board.grid[nc][nr]
+        for i in range(len(move_list)):
+            x_pos, y_pos = move_list[i]
+            counter = 1
 
-                if tile.has_piece():
-                    # same color blocks, can't land there
+            while True:
+                check_square = position[0] + x_pos * counter, position[1] + y_pos * counter
+
+                # Ensure square is within bounds of board
+                if not (0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7):
+                    break
+
+                tile = board.grid[check_square[1]][check_square[0]]
+
+                if tile is not None and tile.has_piece():
                     if tile.is_same_color(self.color):
                         break
-                    # enemy piece: can capture, then stop in this direction
-                    if tile.is_other_color(self.color):
-                        legal_moves.append((nc, nr))
+                    else:
+                        legal_moves.append(check_square)
                         break
-                else:
-                    # empty: can move and keep sliding
-                    legal_moves.append((nc, nr))
 
-                nr += dr
-                nc += dc
+                else:
+                    legal_moves.append(check_square)
+
+                counter += 1
 
         return legal_moves
