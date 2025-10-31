@@ -61,6 +61,12 @@ class GameView(arcade.View):
         self.sprites = ChessSprites(self.sheet, CELL_PIXEL_WIDTH)
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
+        # TRACKERS FOR SPRITE DRAGGING
+        self.dragging_sprite = None
+        self.drag_start_pos = None
+        self.drag_offset_x = 0
+        self.drag_offset_y = 0
+
     def on_draw(self):
         self.clear()
         draw_board(self.board, self.origin_x, self.origin_y, self.square)
@@ -90,7 +96,6 @@ class GameView(arcade.View):
                     self.board.remove_highlights()
                     # new funciton in board
                     self.board.move_piece(rank, file)
-
                     self.board.print_board()
 
                     self.game.turn = Color.BLACK
@@ -106,3 +111,79 @@ class GameView(arcade.View):
                 else:
                     self.board.selected_piece = None
                     self.board.remove_highlights()
+
+    ### -- NEW STUFF FOR SPRITE MOVES -- ###
+    def get_tile_from_mouse(self, x, y):
+        """Convert mouse coordinates to board tile coordinates"""
+        file = int((x - self.origin_x) // self.square)
+        rank = int((y - self.origin_y) // self.square)
+
+        if 0 <= file <= 7 and 0 <= rank <= 7:
+            return file, rank
+        return None, None
+
+    def get_sprite_at_position(self, file, rank):
+        """Find the sprite at a given board position"""
+        # Calculate the center of the square
+        center_x = self.origin_x + file * self.square + self.square // 2
+        center_y = self.origin_y + rank * self.square + self.square // 2
+
+        # Find sprite near this position (within half a square)
+        for sprite in self.sprites.sprite_list:
+            if (abs(sprite.center_x - center_x) < self.square // 2 and
+                    abs(sprite.center_y - center_y) < self.square // 2):
+                return sprite
+        return None
+
+    def move_piece_and_update_sprites(self, rank, file):
+        # Move piece on board and update sprite positions
+        self.board.move_piece(rank, file)
+
+        # Rebuild sprites to show new board state
+        self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
+
+        # Reset game state
+        self.board.print_board()
+        self.game.turn = Color.BLACK
+
+        # Bot's turn
+        bot_moves = self.bot.next_move(fen=self.board.board_state())
+        self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
+        self.board.move_piece(bot_moves[1][0], bot_moves[1][1])
+
+        # Rebuild sprites again after bot move
+        self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
+
+        # User currently hardcoded as white
+        self.game.turn = Color.WHITE
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        # Handle dragging of pieces
+        if self.dragging_sprite:
+            # Update sprite position to follow mouse
+            self.dragging_sprite.center_x = x - self.drag_offset_x
+            self.dragging_sprite.center_y = y - self.drag_offset_y
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        # Handle dropping of pieces
+        if button == arcade.MOUSE_BUTTON_LEFT and self.dragging_sprite:
+            file, rank = self.get_tile_from_mouse(x, y)
+
+            # Check if dropped on valid highlighted square
+            if file is not None and rank is not None:
+                tile = self.board.grid[rank][file]
+
+                if tile.highlighted:
+                    # Valid move
+                    self.board.remove_highlights()
+                    self.move_piece_and_update_sprites(rank, file)
+                else:
+                    return
+                    # Invalid move - snap back to original position
+                    # check for invalid move beneath drag location, if invalid snap back somehow
+
+            else:
+                return
+                # Dropped outside board - snap back
+                # If piece is dragged outside board, snap back to original square
+
