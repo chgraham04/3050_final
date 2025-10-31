@@ -162,7 +162,7 @@ class GameView(arcade.View):
         # Bot's turn
         bot_moves = self.bot.next_move(fen=self.board.board_state())
         self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
-        self.board.move_piece(bot_moves[1][0], bot_moves[1][1])
+        self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
 
         # Rebuild sprites again after bot move
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)

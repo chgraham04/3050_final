@@ -110,14 +110,17 @@ class Board:
         for rank in range(8):
             for file in range(8):
                 piece = self.grid[rank][file].piece_here
-                if piece and piece.color != color:
-                    if (piece.piece_type == PieceType.KING):
-                        curr = piece.get_moves(self, ignore_checks=True)
-                    else:
-                        curr = piece.get_moves(self)
+                if piece and piece.color != color and piece.piece_type != PieceType.KING:
+                    curr = piece.get_moves(self)
 
                     for move in curr:
                         if (move not in all_moves):
+                            all_moves.append(move)
+                
+                if piece and piece.color != color and piece.piece_type == PieceType.KING:
+                    curr = piece.get_moves(self, enemy_moves = all_moves)
+                    for move in curr:
+                        if move not in all_moves:
                             all_moves.append(move)
         
         return all_moves
@@ -188,11 +191,21 @@ class Board:
         return legal_moves
     
     #Checks if a certain tile is under threat of enemy pieces
-    def check_if_danger(self, color: Color, square: tuple[int, int]):
-        enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
+    def check_if_danger(self, color: Color, square: tuple[int, int], enemy_moves: list, visited_squares = None):
 
-        all_moves = self.get_all_enemy_moves(enemy_color)
-        return square in all_moves
+        if visited_squares is None:
+            visited_squares = set()
+
+        #Prevent recursion
+        if square in visited_squares:
+            return False
+
+        visited_squares.add(square)
+
+        if square in enemy_moves:
+            return True
+        
+        return False
     
     #Function handles en passant checking and capturing
     def en_passant(self, piece: Pawn, new_pos: tuple[int, int]):

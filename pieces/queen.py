@@ -42,7 +42,7 @@ class Queen(Piece):
 
                 tile = board.grid[check_square[1]][check_square[0]]
 
-                if tile is not None:
+                if tile is not None and tile.has_piece():
                     if tile.is_same_color(self.color):
                         break
                     else:
