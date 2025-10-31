@@ -24,7 +24,7 @@ class Piece:
     def get_position(self):
         return self.current_pos
     
-    def move(self, new_square: tuple[int, int]):
+    def move(self, new_square: tuple[int, int], board: "Board"):
         self.current_pos = new_square
 
     def get_moves(self, board: "Board"):

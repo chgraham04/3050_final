@@ -110,7 +110,9 @@ class GameView(arcade.View):
 
                     self.game.turn = Color.BLACK
 
+                    print(self.board.board_state()) #Debugging
                     bot_moves = self.bot.next_move(fen=self.board.board_state())
+                    
 
                     self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
 
@@ -189,6 +191,8 @@ class GameView(arcade.View):
                     self.board.remove_highlights()
                     self.move_piece_and_update_sprites(rank, file)
                 else:
+                    orig_file, orig_rank = self.drag_start_pos
+                    self.dragging_sprite.center_x, self.dragging_sprite.center_y = self.sprites._tile_center(self.origin_x, self.origin_y, self.square, orig_rank, orig_file)
                     self.dragging_sprite = None
                     self.drag_start_pos = None
                     self.drag_offset_x = 0
@@ -198,6 +202,8 @@ class GameView(arcade.View):
                     # check for invalid move beneath drag location, if invalid snap back somehow
 
             else:
+                orig_file, orig_rank = self.drag_start_pos
+                self.dragging_sprite.center_x, self.dragging_sprite.center_y = self.sprites._tile_center(self.origin_x, self.origin_y, self.square, orig_rank, orig_file)
                 self.dragging_sprite = None
                 self.drag_start_pos = None
                 self.drag_offset_x = 0

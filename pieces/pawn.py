@@ -18,20 +18,20 @@ class Pawn(Piece):
         return super().get_position()
     
     def move(self, new_square: tuple[int, int], board: "Board"):
-        old_square = self.current_pos
-        self.current_pos = new_square
+        old_x, old_y = self.current_pos
+        new_x, new_y = new_square
         self.has_moved = True
 
         #Check for moving forwards twice (for en passant)
-        if abs(new_square[1] - old_square[1]) == 2:
+        if abs(new_y - old_y) == 2:
               
-            mid_y = (old_square[1] + new_square[1]) // 2
-            board.en_passant_target = (new_square[0], mid_y)
+            mid_y = (old_y + new_y) // 2
+            board.en_passant_target = (new_x, mid_y)
         else:
-             board.en_passant_target = None
+            board.en_passant_target = None
               
          
-    def get_moves(self, board) -> list[tuple[int, int]]:
+    def get_moves(self, board):
         legal_moves = []
         position = self.current_pos
 
@@ -47,6 +47,7 @@ class Pawn(Piece):
 
         #Check for standard move
         check_square = (position[0] + regular_move[0], position[1] + regular_move[1])
+        print(position)
 
         if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
                 tile = board.grid[check_square[1]][check_square[0]]
@@ -57,11 +58,13 @@ class Pawn(Piece):
         #Check for first move
         if not self.has_moved:
             check_square = (position[0] + first_move[0], position[1] + first_move[1])
+            check_empty = (position[0], position[1] + direction)
 
             if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
                     tile = board.grid[check_square[1]][check_square[0]]
+                    empty_tile = board.grid[check_empty[1]][check_empty[0]]
 
-                    if not tile.has_piece():
+                    if not tile.has_piece() and not empty_tile.has_piece():
                         legal_moves.append(check_square) 
         
         #Check for takes
@@ -82,9 +85,8 @@ class Pawn(Piece):
              check_square = (position[0] + x, position[1] + y)
 
              if (check_square == board.en_passant_target):
-                  legal_moves.append((check_square))
+                  legal_moves.append((check_square[0], check_square[1] + direction))
         
-        print(len(legal_moves)) #Testing
         return legal_moves
 
         

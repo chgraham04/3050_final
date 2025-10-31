@@ -23,6 +23,6 @@ def main():
     view = GameView(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     window.show_view(view)
     arcade.run()
-    
+
 if __name__ == "__main__":
     main() 

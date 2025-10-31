@@ -72,8 +72,13 @@ class Board:
         before_move_file = before_move[0]
         self.grid[rank][file].piece_here = self.selected_piece
         # What does this do?
-        # self.board.selected_piece.move([rank,file])
+        self.selected_piece.move((rank, file), self)
         self.grid[before_move_rank][before_move_file].piece_here = None
+        piece = self.selected_piece
+        print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")
+        print(f"{piece.piece_type} next moves are: {piece.get_moves}")
+        
+
         self.selected_piece = None
         #Deals with en passant
         # if (piece.piece_type == PieceType.PAWN):
@@ -160,7 +165,7 @@ class Board:
         #Simulate move
         self.grid[current_pos[1]][current_pos[0]].piece_here = None
         next_pos.piece_here = piece
-        piece.current_pos = next_pos
+        piece.current_pos = new_pos
 
         #See if moves into check
         check = self.check_for_checks(piece.color)

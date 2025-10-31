@@ -55,8 +55,8 @@ class ChessSprites:
         )
 
     def build_from_board(self, board, square: int, origin_x: int, origin_y: int, pad: float = 0.88):
-        self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
-        self._by_piece_id.clear()
+        #self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
+        #self._by_piece_id.clear()
 
         desired_w = square * pad
         scale = desired_w / self.cell_pixel_width  # scale against PNG pixel width
@@ -68,12 +68,20 @@ class ChessSprites:
                     continue
 
                 piece = tile.piece_here
-                tex = self.sheet.get_texture(piece.color, piece.piece_type)
 
-                spr = arcade.Sprite(tex, scale=scale)
-                spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
-                self.sprite_list.append(spr)
-                self._by_piece_id[id(piece)] = spr
+                #Checks if piece already has sprite
+                if id(piece) in self._by_piece_id:
+                    spr = self._by_piece_id[id(piece)]
+                    spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
+
+                else:
+
+                    tex = self.sheet.get_texture(piece.color, piece.piece_type)
+
+                    spr = arcade.Sprite(tex, scale=scale)
+                    spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
+                    self.sprite_list.append(spr)
+                    self._by_piece_id[id(piece)] = spr
 
     def sync_from_board(self, board, square: int, origin_x: int, origin_y: int):
         self.build_from_board(board, square, origin_x, origin_y)
