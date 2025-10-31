@@ -152,9 +152,14 @@ class GameView(arcade.View):
         # Move piece on board and update sprite positions
         self.board.move_piece(file, rank)
 
+
         # Rebuild sprites to show new board state
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
+        captured_piece = self.board.grid[rank][file].piece_here
+        if captured_piece:
+            self.sprites.remove_sprite_by_piece(captured_piece)
+        
         # Reset game state
         self.board.print_board()
         self.game.turn = Color.BLACK

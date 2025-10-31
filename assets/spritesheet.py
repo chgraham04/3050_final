@@ -88,3 +88,9 @@ class ChessSprites:
 
     def draw(self):
         self.sprite_list.draw()
+
+    def remove_sprite_by_piece(self, piece: "Piece"):
+        sprite = self._by_piece_id.get(id(piece))
+        if sprite:
+            sprite = self._by_piece_id.pop(id(piece))
+            self.sprite_list.remove(sprite)

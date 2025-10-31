@@ -68,17 +68,20 @@ class Board:
         before_move = self.selected_piece.get_position()
         before_move_rank = before_move[1]
         before_move_file = before_move[0]
+
         self.selected_piece.move((file, rank), self)
 
         self.grid[rank][file].piece_here = self.selected_piece
-        # What does this do?
         self.grid[before_move_rank][before_move_file].piece_here = None
+
+        #Remove captured pieces from sprite list
         piece = self.selected_piece
         print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")
         print(f"{piece.piece_type} next moves are: {piece.get_moves}")
         
 
         self.selected_piece = None
+        #self.sprites.build_from_board(self, self.square, self.origin_x, self.origin_y)
         #Deals with en passant
         # if (piece.piece_type == PieceType.PAWN):
         #     self.en_passant(piece, new_pos)
