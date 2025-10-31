@@ -4,7 +4,7 @@ from game.import_stockfish import import_stockfish
 
 class Bot:
     def __init__(self) -> None:
-        self.stockfish = Stockfish(path=import_stockfish())
+        self.stockfish = Stockfish(path=r"C:\Users\darkf\Downloads\stockfish-windows-x86-64-avx2\stockfish\stockfish-windows-x86-64-avx2.exe")
 
         self.color = Color.BLACK
 

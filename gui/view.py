@@ -89,13 +89,23 @@ class GameView(arcade.View):
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()
 
+                    #Start dragging the sprite
+                    sprite = self.get_sprite_at_position(file, rank)
+                    if sprite:
+                        self.dragging_sprite = sprite
+                        self.drag_start_pos = (file, rank)
+
+                        #Calculate offset
+                        self.drag_offset_x = x - sprite.center_x
+                        self.drag_offset_y = y - sprite.center_y
+
                 elif (self.game.turn == Color.BLACK):
                     print("Not your turn")
 
                 elif (tile.highlighted == True):
                     self.board.remove_highlights()
-                    # new funciton in board
-                    self.board.move_piece(rank, file)
+                    # new function in board
+                    self.board.move_piece_and_update_sprites(rank, file)
                     self.board.print_board()
 
                     self.game.turn = Color.BLACK
@@ -104,13 +114,14 @@ class GameView(arcade.View):
 
                     self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
 
-                    self.board.move_piece(bot_moves[1][0], bot_moves[1][1])
+                    self.board.move_piece_and_update_sprites(bot_moves[1][0], bot_moves[1][1])
 
                     self.game.turn = Color.WHITE
 
                 else:
                     self.board.selected_piece = None
                     self.board.remove_highlights()
+        
 
     ### -- NEW STUFF FOR SPRITE MOVES -- ###
     def get_tile_from_mouse(self, x, y):
@@ -178,12 +189,25 @@ class GameView(arcade.View):
                     self.board.remove_highlights()
                     self.move_piece_and_update_sprites(rank, file)
                 else:
+                    self.dragging_sprite = None
+                    self.drag_start_pos = None
+                    self.drag_offset_x = 0
+                    self.drag_offset_y = 0
                     return
                     # Invalid move - snap back to original position
                     # check for invalid move beneath drag location, if invalid snap back somehow
 
             else:
+                self.dragging_sprite = None
+                self.drag_start_pos = None
+                self.drag_offset_x = 0
+                self.drag_offset_y = 0
                 return
                 # Dropped outside board - snap back
                 # If piece is dragged outside board, snap back to original square
+        
+        self.dragging_sprite = None
+        self.drag_start_pos = None
+        self.drag_offset_x = 0
+        self.drag_offset_y = 0
 
