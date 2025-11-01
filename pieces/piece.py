@@ -21,6 +21,9 @@ class Piece:
     def __repr__(self):
         return f"{self.color.name} {self.piece_type.name}"
     
+    def delete(self):
+        self.current_pos = None
+    
     def get_position(self):
         return self.current_pos
     

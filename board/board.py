@@ -69,6 +69,10 @@ class Board:
         before_move_rank = before_move[1]
         before_move_file = before_move[0]
 
+        captured_piece = self.grid[rank][file].piece_here
+        if captured_piece:
+            captured_piece.delete
+        
         self.selected_piece.move((file, rank), self)
 
         self.grid[rank][file].piece_here = self.selected_piece
@@ -229,10 +233,6 @@ class Board:
         piece.has_moved = True
     
         self.en_passant_target = None
-
-
-    
-
 
 
 

@@ -2,6 +2,7 @@ import arcade
 from arcade import color as C
 from board.board import Board
 from enums.color import Color
+from enums.pieceType import PieceType
 from assets.spritesheet import Spritesheet, ChessSprites
 from stockfish import Stockfish
 from game.game import Game
@@ -149,16 +150,25 @@ class GameView(arcade.View):
         return None
 
     def move_piece_and_update_sprites(self, file, rank):
+        #piece = self.board.grid[rank][file].piece_here
+
+        #Pawn at end of board
+        #if piece.piece_type == PieceType.PAWN and rank == 7 and piece.color == Color.WHITE:
+        #    handle_promotion(self, piece)
+
+        piece = self.board.grid[rank][file].piece_here
+        if piece:
+            captured_piece = piece
+            self.sprites.remove_sprite_by_piece(captured_piece)
+            self.board.grid[rank][file].piece_here = None
+
+        
         # Move piece on board and update sprite positions
         self.board.move_piece(file, rank)
 
 
         # Rebuild sprites to show new board state
-        self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
-
-        captured_piece = self.board.grid[rank][file].piece_here
-        if captured_piece:
-            self.sprites.remove_sprite_by_piece(captured_piece)
+        self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)        
         
         # Reset game state
         self.board.print_board()
@@ -221,4 +231,11 @@ class GameView(arcade.View):
         self.drag_start_pos = None
         self.drag_offset_x = 0
         self.drag_offset_y = 0
+    
+    
+    #def handle_promotion(self):
+        #Remove piece previously there
+        #sprite.remove_sprite_by_piece
+        #Set piece to queen
+
 
