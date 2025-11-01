@@ -80,9 +80,12 @@ class Board:
 
         #Remove captured pieces from sprite list
         piece = self.selected_piece
-        print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")
-        print(f"{piece.piece_type} next moves are: {piece.get_moves}")
-        
+        enemy_color = Color.BLACK if piece.color == Color.WHITE else Color.WHITE
+
+        if self.check_for_checks(enemy_color):
+            print(f"{enemy_color.name} is in check!")
+
+        print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")    
 
         self.selected_piece = None
         #self.sprites.build_from_board(self, self.square, self.origin_x, self.origin_y)
@@ -123,12 +126,6 @@ class Board:
                     for move in curr:
                         if (move not in all_moves):
                             all_moves.append(move)
-                
-                if piece and piece.color != color and piece.piece_type == PieceType.KING:
-                    curr = piece.get_moves(self, enemy_moves = all_moves)
-                    for move in curr:
-                        if move not in all_moves:
-                            all_moves.append(move)
         
         return all_moves
 
@@ -157,7 +154,7 @@ class Board:
                 return False
 
             enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
-            enemy_moves = self.get_all_enemy_moves(enemy_color)
+            enemy_moves = self.get_all_enemy_moves(color)
             return king_pos in enemy_moves
         
         finally:
