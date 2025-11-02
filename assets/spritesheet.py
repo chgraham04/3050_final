@@ -1,11 +1,11 @@
-# assets/spritesheet.py
+''' This module creates the sprites and draws the board '''
 from __future__ import annotations
 import os
-import arcade
 from typing import Dict, Tuple
+import arcade
 
-PIECE_NAMES = ["king", "queen", "bishop", "knight", "rook", "pawn"]
-COLOR_NAMES = ["white", "black"]
+piece_names = ["king", "queen", "bishop", "knight", "rook", "pawn"]
+color_names = ["white", "black"]
 
 class Spritesheet:
     """
@@ -18,9 +18,12 @@ class Spritesheet:
         self._textures: Dict[Tuple[str, str], arcade.Texture] = {}
         self._load_textures()
 
+    def __repr__(self):
+        return "assets/sprites"
+
     def _load_textures(self):
-        for color in COLOR_NAMES:
-            for piece in PIECE_NAMES:
+        for color in color_names:
+            for piece in piece_names:
                 filename = f"{color}_{piece}.png"
                 full_path = os.path.join(self.dir, filename)
                 if not os.path.exists(full_path):
@@ -48,13 +51,15 @@ class ChessSprites:
         self._by_piece_id: Dict[int, arcade.Sprite] = {}
 
     @staticmethod
-    def _tile_center(origin_x: int, origin_y: int, square: int, rank: int, file: int) -> tuple[float, float]:
+    def _tile_center(origin_x: int, origin_y: int, square: int,
+                      rank: int, file: int) -> tuple[float, float]:
         return (
             origin_x + file * square + square / 2,
             origin_y + rank * square + square / 2,
         )
 
-    def build_from_board(self, board, square: int, origin_x: int, origin_y: int, pad: float = 0.88):
+    def build_from_board(self, board, square: int, origin_x: int, origin_y: int):
+        pad: float = 0.88
         self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
         self._by_piece_id.clear()
 
@@ -72,18 +77,21 @@ class ChessSprites:
                 #Checks if piece already has sprite
                 if id(piece) in self._by_piece_id:
                     spr = self._by_piece_id[id(piece)]
-                    spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
+                    spr.center_x, spr.center_y = self._tile_center(
+                        origin_x, origin_y, square, rank, file)
 
                 else:
 
                     tex = self.sheet.get_texture(piece.color, piece.piece_type)
 
                     spr = arcade.Sprite(tex, scale=scale)
-                    spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
+                    spr.center_x, spr.center_y = self._tile_center(
+                        origin_x, origin_y, square, rank, file)
                     self.sprite_list.append(spr)
                     self._by_piece_id[id(piece)] = spr
 
-    def sync_from_board(self, board, square: int, origin_x: int, origin_y: int, pad: float = 0.88):
+    def sync_from_board(self, board, square: int, origin_x: int, origin_y: int):
+        pad: float = 0.88
         self.build_from_board(board, square, origin_x, origin_y)
 
         desired_w = square * pad
@@ -99,7 +107,8 @@ class ChessSprites:
                         tex = self.sheet.get_texture(piece.color, piece.piece_type)
 
                         spr = arcade.Sprite(tex, scale=scale)
-                        spr.center_x, spr.center_y = self._tile_center(origin_x, origin_y, square, rank, file)
+                        spr.center_x, spr.center_y = self._tile_center(
+                            origin_x, origin_y, square, rank, file)
                         self.sprite_list.append(spr)
                         self._by_piece_id[id(piece)] = spr
                 else:

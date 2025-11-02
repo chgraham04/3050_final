@@ -85,7 +85,6 @@ class GameView(arcade.View):
 
                 # TODO: Implement for whichever color's turn it is
                 if (tile.has_piece() and tile.piece_here.color == Color.WHITE):
-                    print("Piece clicked!")
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()

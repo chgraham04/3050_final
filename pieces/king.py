@@ -25,7 +25,6 @@ class King(Piece):
     def get_moves(self, board, ignore_checks: bool = False):
         legal_moves = []
         position = self.current_pos
-        print(ignore_checks)
         
 
         #Legal moves for King
@@ -57,7 +56,6 @@ class King(Piece):
             return legal_moves
         ignore_checks = True
         
-        print("Still goin")
         #enemy_moves = board.get_all_enemy_moves(self.color)
 
         #CASTLING

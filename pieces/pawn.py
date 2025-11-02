@@ -48,7 +48,6 @@ class Pawn(Piece):
 
         #Check for standard move
         check_square = (position[0] + regular_move[0], position[1] + regular_move[1])
-        print(position)
 
         if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
                 tile = board.grid[check_square[1]][check_square[0]]

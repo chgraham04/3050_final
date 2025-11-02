@@ -24,7 +24,7 @@ class Board:
         for rank in range(8):
             for file in range(8):
                 # determine if tile is light or dark square
-                is_light = ((file + rank) % 2 == 1)
+                is_light = (file + rank) % 2 == 1
                 # assign Tile object to list
                 # use grid structure to format 2d matrix
                 self.grid[rank][file] = Tile(file, rank, is_light)
@@ -72,17 +72,13 @@ class Board:
         captured_piece = self.grid[rank][file].piece_here
         if captured_piece:
             captured_piece.delete
-        
+
         self.selected_piece.move((file, rank), self)
 
         self.grid[rank][file].piece_here = self.selected_piece
         self.grid[before_move_rank][before_move_file].piece_here = None
 
         piece = self.selected_piece
-        if piece.piece_type == PieceType.KING:
-            print(f"Moved king from rank {rank} to file {file}")
-
-        print(piece.piece_type == PieceType.PAWN)
         # CASTLING
         if piece.piece_type == PieceType.KING and before_move_file == 4:
             if piece.color == Color.WHITE and rank == 0 and file == 6:
@@ -124,7 +120,7 @@ class Board:
         if self.check_for_checks(enemy_color):
             print(f"{enemy_color.name} is in check!")
 
-        print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")    
+        print(f"{piece.color} {piece.piece_type} moved from {before_move} to {(file, rank)}")
 
         self.selected_piece = None
         #self.sprites.build_from_board(self, self.square, self.origin_x, self.origin_y)
@@ -163,9 +159,9 @@ class Board:
                     curr = piece.get_moves(self)
 
                     for move in curr:
-                        if (move not in all_moves):
+                        if move not in all_moves:
                             all_moves.append(move)
-        
+
         return all_moves
 
     #Function finds the player's king
@@ -175,16 +171,16 @@ class Board:
                 piece = self.grid[rank][file].piece_here
                 if piece and piece.color == color and piece.piece_type.name == "KING":
                     return (file, rank)
-        
+
         return None
-    
+
     #Function checks whether king is currently in check
     def check_for_checks(self, color: Color):
-        
+
         # prevent infinite recursion
         if self.checking_for_checks:
             return False
-        
+
         self.checking_for_checks = True
 
         try:
@@ -195,10 +191,10 @@ class Board:
             enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
             enemy_moves = self.get_all_enemy_moves(color)
             return king_pos in enemy_moves
-        
+
         finally:
             self.checking_for_checks = False
-        
+
     #Function checks to see if moves will put king in check
     def check_if_move_into_check(self, piece: Piece, new_pos: tuple[int, int]):
         current_pos = piece.current_pos
@@ -221,7 +217,7 @@ class Board:
         piece.current_pos = current_pos
 
         return check
-    
+
     #Returns all legal moves that do not put king in check
     def get_all_legal(self, piece: Piece):
         check_moves = piece.get_moves(self)
@@ -232,9 +228,10 @@ class Board:
                 legal_moves.append(move)
 
         return legal_moves
-    
+
     #Checks if a certain tile is under threat of enemy pieces
-    def check_if_danger(self, color: Color, square: tuple[int, int], enemy_moves: list, visited_squares = None):
+    def check_if_danger(self, 
+                        color: Color, square: tuple[int, int], enemy_moves: list, visited_squares = None):
 
         if visited_squares is None:
             visited_squares = set()
@@ -247,33 +244,28 @@ class Board:
 
         if square in enemy_moves:
             return True
-        
+
         return False
-    
+
     #Function handles en passant checking and capturing
     def en_passant(self, piece: Pawn, new_pos: tuple[int, int]):
         prev_pos = piece.current_pos
 
         if self.en_passant_target and new_pos == self.en_passant_target:
-                
+
             if piece.color == Color.WHITE:
                 check_square = (new_pos[0], new_pos[1] - 1)
             else:
                 check_square = (new_pos[0], new_pos[1] + 1)
-            
+
             self.grid[check_square[1]][check_square[0]].piece_here = None
-        
+
         self.grid[prev_pos[1]][prev_pos[0]].piece_here = None
         self.grid[new_pos[1]][new_pos[0]].piece_here = piece
         piece.current_pos = new_pos
         piece.has_moved = True
-    
+
         self.en_passant_target = None
-
-
-
-
-        
 
 
     ### JUST FOR TESTING ###

@@ -1,28 +1,20 @@
+''' This module calls functions to set up the game window and start the game loop'''
 import arcade
-from arcade import color as C
-from board.board import Board
-from pieces.piece import Piece, PieceType, Color
-from gui.view import GameView, draw_board
-from game.game import Game
+from gui.view import GameView
 
 # constants
-# TODO: make these dynamic depending on device
-
-
 def main():
-    game = Game()
-
-    BOARD_PIXELS = 850
-    SCREEN_HEIGHT = 850
-    SIDEBAR_WIDTH = 260
-    SCREEN_WIDTH = BOARD_PIXELS + SIDEBAR_WIDTH
-    SCREEN_TITLE = "CS3050 Chess"
+    board_pixels = 850
+    screen_height = 850
+    sidebar_width = 260
+    screen_width = board_pixels + sidebar_width
+    screen_title = "CS3050 Chess"
 
     #self.board.print_board()
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    view = GameView(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = arcade.Window(screen_width, screen_height, screen_title)
+    view = GameView(screen_width, screen_height, screen_title)
     window.show_view(view)
     arcade.run()
 
 if __name__ == "__main__":
-    main() 
+    main()
