@@ -12,6 +12,7 @@ class King(Piece):
     def __init__(self, color: Color, start_pos: tuple):
         piece_value = 1000
         super().__init__(PieceType.KING, color, piece_value, start_pos)
+        self.piece_type = PieceType.KING
 
     def get_position(self):
         return super().get_position()
@@ -50,13 +51,14 @@ class King(Piece):
 
                     legal_moves.append((check_square[0], check_square[1]))
         
-        return legal_moves
 
         #Skips checking for castling if ignore checks turned on - prevents recursion
         if ignore_checks:
             return legal_moves
+        ignore_checks = True
         
         print("Still goin")
+        #enemy_moves = board.get_all_enemy_moves(self.color)
 
         #CASTLING
         if not self.has_moved and not board.check_for_checks(self.color):
@@ -77,8 +79,7 @@ class King(Piece):
 
                     #Ensure castling squares are safe from check and have no pieces occupying
                     if (not board.grid[row][5].has_piece()) and (not board.grid[row][6].has_piece()):
-                        if (not board.check_if_danger(self.color, (5, row))) and (not board.check_if_danger(self.color, (5, row))):
-                            legal_moves.append((6, row))
+                        legal_moves.append((6, row))
 
             queen_rook_tile = board.grid[row][0]
             queen_rook = queen_rook_tile.piece_here
@@ -91,8 +92,7 @@ class King(Piece):
 
                     #Ensure castling squares are safe from check and have no pieces occupying
                     if (not board.grid[row][1].has_piece()) and (not board.grid[row][2].has_piece()) and (not board.grid[row][3].has_piece()):
-                        if (not board.check_if_danger(self.color, (2, row))) and (not board.check_if_danger(self.color, (3, row))):
-                            legal_moves.append((2, row))
+                        legal_moves.append((2, row))
         
         
         return legal_moves

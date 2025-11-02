@@ -78,6 +78,45 @@ class Board:
         self.grid[rank][file].piece_here = self.selected_piece
         self.grid[before_move_rank][before_move_file].piece_here = None
 
+        piece = self.selected_piece
+        if piece.piece_type == PieceType.KING:
+            print(f"Moved king from rank {rank} to file {file}")
+
+        print(piece.piece_type == PieceType.PAWN)
+        # CASTLING
+        if piece.piece_type == PieceType.KING and before_move_file == 4:
+            if piece.color == Color.WHITE and rank == 0 and file == 6:
+                rook = self.grid[0][7].get_piece_here()
+                if rook:
+                    self.grid[0][5].piece_here = rook
+                    self.grid[0][7].piece_here = None
+                    rook.current_pos = (5, 0)
+                    print("White short castle")
+
+            elif piece.color == Color.WHITE and rank == 0 and file == 2:
+                rook = self.grid[0][0].get_piece_here()
+                if rook:
+                    self.grid[0][3].piece_here = rook
+                    self.grid[0][0].piece_here = None
+                    rook.current_pos = (3, 0)
+                    print("White long castle")
+
+            elif piece.color == Color.BLACK and rank == 7 and file == 6:
+                rook = self.grid[7][7].get_piece_here()
+                if rook:
+                    self.grid[7][5].piece_here = rook
+                    self.grid[7][7].piece_here = None
+                    rook.current_pos = (5, 7)
+                    print("Black short castle")
+
+            elif piece.color == Color.BLACK and rank == 7 and file == 2:
+                rook = self.grid[7][0].get_piece_here()
+                if rook:
+                    self.grid[7][3].piece_here = rook
+                    self.grid[7][0].piece_here = None
+                    rook.current_pos = (3, 7)
+                    print("Black long castle")
+
         #Remove captured pieces from sprite list
         piece = self.selected_piece
         enemy_color = Color.BLACK if piece.color == Color.WHITE else Color.WHITE

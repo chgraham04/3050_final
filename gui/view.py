@@ -153,8 +153,11 @@ class GameView(arcade.View):
         #piece = self.board.grid[rank][file].piece_here
 
         #Pawn at end of board
-        #if piece.piece_type == PieceType.PAWN and rank == 7 and piece.color == Color.WHITE:
-        #    handle_promotion(self, piece)
+        piece = self.board.grid[rank][file].piece_here
+        if piece and piece.piece_type == PieceType.PAWN and rank == 7 and piece.color == Color.WHITE:
+            piece = self.board.grid[rank][file].piece_here
+            piece.piece_type = PieceType.QUEEN
+            self.board.grid[rank][file].piece_here = piece
 
         piece = self.board.grid[rank][file].piece_here
         if piece:
@@ -233,9 +236,4 @@ class GameView(arcade.View):
         self.drag_offset_y = 0
     
     
-    #def handle_promotion(self):
-        #Remove piece previously there
-        #sprite.remove_sprite_by_piece
-        #Set piece to queen
-
 

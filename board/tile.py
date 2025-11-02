@@ -25,7 +25,9 @@ class Tile:
     
     def clear_highlight(self):
         self.highlighted = False
-
+    
+    def get_piece_here(self):
+        return self.piece_here
     
     
 

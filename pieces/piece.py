@@ -1,14 +1,8 @@
 from enums.color import Color
 from enum import Enum, auto
 from enums.pieceValue import PieceValue
+from enums.pieceType import PieceType
 
-class PieceType(Enum):
-    PAWN = auto()
-    KNIGHT = auto()
-    BISHOP = auto()
-    ROOK = auto()
-    QUEEN = auto()
-    KING = auto()
 
 class Piece:
     def __init__(self, piece_type: PieceType, color: Color, piece_value: PieceValue, start_pos: tuple):
