@@ -2,7 +2,7 @@ import arcade
 from arcade import color as C
 from _board.board import Board
 from _enums.color import Color
-from _enums.pieceType import PieceType
+from _enums.piece_type import PieceType
 from _assets.spritesheet import Spritesheet, ChessSprites
 from stockfish import Stockfish
 from _game.game import Game

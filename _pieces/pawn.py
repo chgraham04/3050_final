@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from _pieces.piece import Piece
-from _enums.pieceType import PieceType
+from _enums.piece_type import PieceType
 from _enums.color import Color
-from _enums.pieceValue import PieceValue
+from _enums.piece_value import PieceValue
 
 
 @dataclass
