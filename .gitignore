@@ -21,4 +21,4 @@ ENV/
 Thumbs.db
 
 # Project specific
-assets/stockfish/
+_assets/stockfish/
