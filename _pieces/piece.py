@@ -8,6 +8,7 @@ from _enums.piece_type import PieceType
 ### -- PYLINT NOTES -- ###
 # 8 instance attributes required to store piece data/implement piece functionality
 # no obvious way to refactor this to pass test
+### ------------------ ###
 
 class Piece:
     """

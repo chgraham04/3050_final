@@ -10,6 +10,7 @@ from _pieces.piece import Piece
 ### -- PYLINT NOTES -- ###
 # current_pos initialized in parent class
 # __init__ calls super class current_pos assignment, sets self.current_pos
+### ------------------ ###
 
 @dataclass
 class Pawn(Piece):
