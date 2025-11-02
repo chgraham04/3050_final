@@ -1,7 +1,7 @@
 import os
-from enums.color import Color
+from _enums.color import Color
 from stockfish import Stockfish
-from game.import_stockfish import import_stockfish
+from _game.import_stockfish import import_stockfish
 
 
 class Bot:

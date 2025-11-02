@@ -1,12 +1,12 @@
 import arcade
 from arcade import color as C
-from board.board import Board
-from enums.color import Color
-from enums.pieceType import PieceType
-from assets.spritesheet import Spritesheet, ChessSprites
+from _board.board import Board
+from _enums.color import Color
+from _enums.pieceType import PieceType
+from _assets.spritesheet import Spritesheet, ChessSprites
 from stockfish import Stockfish
-from game.game import Game
-from bot.bot import Bot
+from _game.game import Game
+from _bot.bot import Bot
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ = (181, 136, 99)
@@ -57,8 +57,8 @@ class GameView(arcade.View):
 
         CELL_PIXEL_WIDTH = 256
 
-        # Loader + sprites from assets/spritesheet.py
-        self.sheet = Spritesheet("assets/sprites")
+        # Loader + sprites from _assets/spritesheet.py
+        self.sheet = Spritesheet("_assets/sprites")
         self.sprites = ChessSprites(self.sheet, CELL_PIXEL_WIDTH)
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
@@ -104,7 +104,7 @@ class GameView(arcade.View):
 
                 elif (tile.highlighted == True):
                     self.board.remove_highlights()
-                    # new function in board
+                    # new function in _board
                     self.board.move_piece_and_update_sprites(file, rank)
                     self.board.print_board()
 
@@ -127,7 +127,7 @@ class GameView(arcade.View):
 
     ### -- NEW STUFF FOR SPRITE MOVES -- ###
     def get_tile_from_mouse(self, x, y):
-        """Convert mouse coordinates to board tile coordinates"""
+        """Convert mouse coordinates to _board tile coordinates"""
         file = int((x - self.origin_x) // self.square)
         rank = int((y - self.origin_y) // self.square)
 
@@ -136,7 +136,7 @@ class GameView(arcade.View):
         return None, None
 
     def get_sprite_at_position(self, file, rank):
-        """Find the sprite at a given board position"""
+        """Find the sprite at a given _board position"""
         # Calculate the center of the square
         center_x = self.origin_x + file * self.square + self.square // 2
         center_y = self.origin_y + rank * self.square + self.square // 2
@@ -149,9 +149,9 @@ class GameView(arcade.View):
         return None
 
     def move_piece_and_update_sprites(self, file, rank):
-        #piece = self.board.grid[rank][file].piece_here
+        #piece = self._board.grid[rank][file].piece_here
 
-        #Pawn at end of board
+        #Pawn at end of _board
         piece = self.board.grid[rank][file].piece_here
         if piece and piece.piece_type == PieceType.PAWN and rank == 7 and piece.color == Color.WHITE:
             piece = self.board.grid[rank][file].piece_here
@@ -165,14 +165,14 @@ class GameView(arcade.View):
             self.board.grid[rank][file].piece_here = None
 
         
-        # Move piece on board and update sprite positions
+        # Move piece on _board and update sprite positions
         self.board.move_piece(file, rank)
 
 
-        # Rebuild sprites to show new board state
+        # Rebuild sprites to show new _board state
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)        
         
-        # Reset game state
+        # Reset _game state
         self.board.print_board()
         self.game.turn = Color.BLACK
 
@@ -181,21 +181,21 @@ class GameView(arcade.View):
         self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
         self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
 
-        # Rebuild sprites again after bot move
+        # Rebuild sprites again after _bot move
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
         # User currently hardcoded as white
         self.game.turn = Color.WHITE
 
     def on_mouse_motion(self, x, y, dx, dy):
-        # Handle dragging of pieces
+        # Handle dragging of _pieces
         if self.dragging_sprite:
             # Update sprite position to follow mouse
             self.dragging_sprite.center_x = x - self.drag_offset_x
             self.dragging_sprite.center_y = y - self.drag_offset_y
 
     def on_mouse_release(self, x, y, button, modifiers):
-        # Handle dropping of pieces
+        # Handle dropping of _pieces
         if button == arcade.MOUSE_BUTTON_LEFT and self.dragging_sprite:
             file, rank = self.get_tile_from_mouse(x, y)
 
@@ -226,8 +226,8 @@ class GameView(arcade.View):
                 self.drag_offset_x = 0
                 self.drag_offset_y = 0
                 return
-                # Dropped outside board - snap back
-                # If piece is dragged outside board, snap back to original square
+                # Dropped outside _board - snap back
+                # If piece is dragged outside _board, snap back to original square
         
         self.dragging_sprite = None
         self.drag_start_pos = None

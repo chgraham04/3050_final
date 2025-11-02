@@ -1,7 +1,7 @@
-from enums.color import Color
+from _enums.color import Color
 from enum import Enum, auto
-from enums.pieceValue import PieceValue
-from enums.pieceType import PieceType
+from _enums.pieceValue import PieceValue
+from _enums.pieceType import PieceType
 
 
 class Piece:

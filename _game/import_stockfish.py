@@ -6,7 +6,7 @@ from tarfile import open as taropen
 from io import BytesIO
 
 #Function automatically downloads and opens stockfish chess engine
-def import_stockfish(dir_path = "assets/stockfish"):
+def import_stockfish(dir_path = "_assets/stockfish"):
 
     #Check if stockfish is already installed
     stockfish_found = False

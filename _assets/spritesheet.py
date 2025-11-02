@@ -1,4 +1,4 @@
-''' This module creates the sprites and draws the board '''
+''' This module creates the sprites and draws the _board '''
 from __future__ import annotations
 import os
 from typing import Dict, Tuple
@@ -10,16 +10,16 @@ color_names = ["white", "black"]
 class Spritesheet:
     """
     Simplified spritesheet loader for 12 unique PNGs.
-    Loads textures from assets/sprites/ and provides them via get_texture().
+    Loads textures from _assets/sprites/ and provides them via get_texture().
     """
-    def __init__(self, sprites_dir: str = "assets/sprites"):
+    def __init__(self, sprites_dir: str = "_assets/sprites"):
         base_dir = os.path.dirname(__file__)
         self.dir = os.path.normpath(os.path.join(base_dir, "..", sprites_dir))
         self._textures: Dict[Tuple[str, str], arcade.Texture] = {}
         self._load_textures()
 
     def __repr__(self):
-        return "assets/sprites"
+        return "_assets/sprites"
 
     def _load_textures(self):
         for color in color_names:
@@ -43,7 +43,7 @@ class Spritesheet:
 
 
 class ChessSprites:
-    """Manages an Arcade SpriteList for all board pieces."""
+    """Manages an Arcade SpriteList for all _board _pieces."""
     def __init__(self, sheet: Spritesheet, cell_pixel_width: int):
         self.sheet = sheet
         self.sprite_list = arcade.SpriteList(use_spatial_hash=True)

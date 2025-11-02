@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from pieces.piece import Piece
-from enums.pieceType import PieceType
-from enums.color import Color
-from enums.pieceValue import PieceValue
+from _pieces.piece import Piece
+from _enums.pieceType import PieceType
+from _enums.color import Color
+from _enums.pieceValue import PieceValue
 
 @dataclass
 class King(Piece):
@@ -45,7 +45,7 @@ class King(Piece):
             if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
                 tile = board.grid[check_square[1]][check_square[0]]
 
-                #See what piece is on the board; from tile.py
+                #See what piece is on the _board; from tile.py
                 if not tile.has_piece() or tile.is_other_color(self.color):
 
                     legal_moves.append((check_square[0], check_square[1]))
@@ -56,7 +56,7 @@ class King(Piece):
             return legal_moves
         ignore_checks = True
         
-        #enemy_moves = board.get_all_enemy_moves(self.color)
+        #enemy_moves = _board.get_all_enemy_moves(self.color)
 
         #CASTLING
         if not self.has_moved and not board.check_for_checks(self.color):
@@ -75,7 +75,7 @@ class King(Piece):
 
                 if not rook.has_moved:
 
-                    #Ensure castling squares are safe from check and have no pieces occupying
+                    #Ensure castling squares are safe from check and have no _pieces occupying
                     if (not board.grid[row][5].has_piece()) and (not board.grid[row][6].has_piece()):
                         legal_moves.append((6, row))
 
@@ -88,7 +88,7 @@ class King(Piece):
 
                 if not rook.has_moved:
 
-                    #Ensure castling squares are safe from check and have no pieces occupying
+                    #Ensure castling squares are safe from check and have no _pieces occupying
                     if (not board.grid[row][1].has_piece()) and (not board.grid[row][2].has_piece()) and (not board.grid[row][3].has_piece()):
                         legal_moves.append((2, row))
         
