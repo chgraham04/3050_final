@@ -18,7 +18,7 @@ class Board:
     """
 
     def __init__(self) -> None:
-        """Initialize the chess _board with tiles and _pieces in starting positions."""
+        """Initialize the chess board with tiles and pieces in starting positions."""
         # nested list format
         # creates 8 lists for each row, each with 8 tile objects
         # initialized to none, replaced by Tile objects later
@@ -38,7 +38,7 @@ class Board:
         self.initialize_pieces()
 
     def initialize_pieces(self):
-        """Initialize and populate all _pieces to starting locations on _board."""
+        """Initialize and populate all pieces to starting locations on the board"""
         # Pawns
         for file in range(8):
             self.grid[1][file].piece_here = Pawn(Color.WHITE, (file, 1))
@@ -137,11 +137,11 @@ class Board:
         self.selected_piece = None
 
     def get_piece(self, piece: Piece):
-        """Set the currently selected piece."""
+        """Set the currently selected piece"""
         self.selected_piece = piece
 
     def highlight_moves(self):
-        """Highlight all legal moves for the currently selected piece."""
+        """Highlight all legal moves for the currently selected piece"""
         # ensure a piece is selected
         if self.selected_piece:
             legal_moves = self.get_all_legal(self.selected_piece)
@@ -149,18 +149,17 @@ class Board:
                 self.grid[move[1]][move[0]].highlight_move()
 
     def remove_highlights(self):
-        """Remove all highlighted legal moves from the _board."""
+        """Remove all highlighted legal moves from the board"""
         for rank in range(8):
             for file in range(8):
                 self.grid[rank][file].clear_highlight()
 
     def get_all_enemy_moves(self, color: Color):
         """
-        Get all possible moves for _pieces of the opposite color.
+        Get all possible moves for pieces of the opposite color.
 
         Args:
-            color: The color of the player whose enemy moves to get
-
+            color: The color of the player whose opponent moves to get
         Returns:
             List of all possible enemy move positions
         """
@@ -182,11 +181,10 @@ class Board:
 
     def find_king(self, color: Color):
         """
-        Find the position of the king for the specified color.
+        Find the position of the king for the specified color
 
         Args:
             color: The color of the king to find
-
         Returns:
             Tuple of (file, rank) or None if king not found
         """
@@ -205,7 +203,6 @@ class Board:
 
         Args:
             color: The color of the king to check
-
         Returns:
             True if king is in check, False otherwise
         """
@@ -233,7 +230,6 @@ class Board:
         Args:
             piece: The piece to move
             new_pos: The target position (file, rank)
-
         Returns:
             True if move would result in check, False otherwise
         """
@@ -264,7 +260,6 @@ class Board:
 
         Args:
             piece: The piece to get legal moves for
-
         Returns:
             List of legal move positions
         """
@@ -280,13 +275,12 @@ class Board:
     def check_if_danger(self, square: tuple[int, int], enemy_moves: list,
                         visited_squares=None):
         """
-        Check if a certain tile is under threat of enemy _pieces
+        Check if a certain tile is under threat of enemy pieces
 
         Args:
             square: The position to check (file, rank)
             enemy_moves: List of all enemy move positions
             visited_squares: Set of already visited squares to prevent recursion
-
         Returns:
             True if square is under attack, False otherwise
         """
