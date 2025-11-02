@@ -57,8 +57,8 @@ class GameView(arcade.View):
 
         CELL_PIXEL_WIDTH = 256
 
-        # Loader + sprites from _assets/spritesheet.py
-        self.sheet = Spritesheet("_assets/sprites")
+        # Loader + _sprites from _assets/spritesheet.py
+        self.sheet = Spritesheet("_assets/_sprites")
         self.sprites = ChessSprites(self.sheet, CELL_PIXEL_WIDTH)
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
@@ -169,7 +169,7 @@ class GameView(arcade.View):
         self.board.move_piece(file, rank)
 
 
-        # Rebuild sprites to show new _board state
+        # Rebuild _sprites to show new _board state
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)        
         
         # Reset _game state
@@ -181,7 +181,7 @@ class GameView(arcade.View):
         self.board.selected_piece = self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
         self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
 
-        # Rebuild sprites again after _bot move
+        # Rebuild _sprites again after _bot move
         self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
         # User currently hardcoded as white
