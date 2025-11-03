@@ -2,7 +2,7 @@
 
 Prior to running project:
 
-1. Install all requirements using ```pip install requirements.txt``` or individually by installing arcade and stockfish via pip.
+1. Install all requirements using ```pip install -r requirements.txt``` or individually by installing arcade and stockfish via pip.
 
 To run the project, simply run main.py. The program will take a minute to open upon first being run as it installs the Stockfish engine. Upon starting, click a piece to show all legal moves as green tiles. Drag the piece to one of these tiles to move it. 
 
