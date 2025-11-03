@@ -88,8 +88,10 @@ class Board:
             # print(f"DEBUG: Material Differential Before: {self.material_differential}")
             if captured_piece.color == Color.WHITE:
                 self.material_differential -= piece_val
-            else:
+                print("WHITE captured")
+            if captured_piece.color == Color.BLACK:
                 self.material_differential += piece_val
+                print("BLACK captured")
 
             # print(f"DEBUG: Material Differential After: {self.material_differential}")
             # Actually call the delete method
@@ -100,6 +102,7 @@ class Board:
         self.grid[rank][file].piece_here = self.selected_piece
         self.grid[before_move_rank][before_move_file].piece_here = None
 
+        self.material_differential = self.calculate_material()
         piece = self.selected_piece
         # CASTLING
         if piece.piece_type == PieceType.KING and before_move_file == 4:
@@ -387,6 +390,32 @@ class Board:
             fen_string += (fen_row + "/")
         fen_string = fen_string[:-1]
         return fen_string
+    
+    def calculate_material(self):
+        ''' 
+        Calculates the total material balance of the board
+         
+        Returns:
+            Difference in total white material vs total black material 
+        '''
+        white_total = 0
+        black_total = 0
+
+        for rank in range(8):
+            for file in range(8):
+                piece = self.grid[rank][file].piece_here
+
+                if not piece:
+                    continue
+
+                value = piece.piece_value.value if hasattr(piece.piece_value, "value") else piece.piece_value
+
+                if piece.color == Color.WHITE:
+                    white_total += value
+                else:
+                    black_total += value
+
+        return white_total - black_total
 
     def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
         """Handle mouse release events (placeholder for future implementation)"""
