@@ -12,9 +12,9 @@ class Bot:
             raise FileNotFoundError("Could not find or download Stockfish executable")
 
         print(f"Using Stockfish at: {stockfish_path}")
-        self.stockfish = Stockfish(path=stockfish_path)
+        self.stockfish = Stockfish(path=stockfish_path, parameters={"Skill Level": 1})
         self.color = Color.BLACK
-
+        
     def next_move(self, fen: str) -> list[tuple[int, int]]:
         files = {"a": 0, "b": 1, "c": 2,
                  "d": 3, "e": 4, "f": 5,
