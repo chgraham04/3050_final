@@ -26,6 +26,7 @@ class Board:
         self.selected_piece = None
         self.checking_for_checks = False
         self.en_passant_target = None
+        self.material_differential = 0
 
         # assign tile objects to None lists
         for rank in range(8):
@@ -81,6 +82,16 @@ class Board:
 
         captured_piece = self.grid[rank][file].piece_here
         if captured_piece:
+            # very piece_value is enum, need the integer .value
+            piece_val = captured_piece.piece_value.value
+            # print(f"DEBUG: Captured {captured_piece.color} {captured_piece.piece_type} worth {piece_val}")
+            # print(f"DEBUG: Material Differential Before: {self.material_differential}")
+            if captured_piece.color == Color.WHITE:
+                self.material_differential -= piece_val
+            else:
+                self.material_differential += piece_val
+
+            # print(f"DEBUG: Material Differential After: {self.material_differential}")
             # Actually call the delete method
             captured_piece.delete()
 

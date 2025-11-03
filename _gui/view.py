@@ -39,7 +39,7 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
 
 
-def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game):
+def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: Board):
     """
     Draw the side panel with game information
 
@@ -61,6 +61,18 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game):
     turn_text = "White's Turn" if game.turn == Color.WHITE else "Black's Turn"
     arcade.draw_text(turn_text, x + width // 2, y + height - 80,
                      C.WHITE, 16, anchor_x="center")
+
+    material_diff = board.material_differential
+    # print(f"DEBUG draw_sidepanel: material diff = {material_diff}")
+    if material_diff > 0:
+        material_msg = f"White + {material_diff}"
+    elif material_diff < 0:
+        material_msg = f"Black + {abs(material_diff)}"
+    else:
+        material_msg = f"Even Material"
+
+    arcade.draw_text(material_msg, x + width // 2, y + height - 120,
+                     C.WHITE, 14, anchor_x="center")
 
 class GameView(arcade.View):
     """
@@ -111,7 +123,7 @@ class GameView(arcade.View):
         draw_board(self.board, self.origin_x, self.origin_y, self.square)
         self.sprites.draw()
         draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
-                       self.window.height, self.game)
+                       self.window.height, self.game, self.board)
 
     def on_mouse_press(self, x, y, button, modifiers):
         """
