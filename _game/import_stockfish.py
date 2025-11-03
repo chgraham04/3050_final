@@ -12,13 +12,14 @@ def import_stockfish(dir_path = "_assets/stockfish"):
 
     #Check if stockfish is already installed
     stockfish_found = False
-    system = platform.system
-    print("Found")
+    system = platform.system()
+    
 
     for root, dirs, files in os.walk(dir_path):
             for file in files:
                 if 'stockfish' in file.lower():
                     stockfish_found = True
+                    print("Found")
 
                     path_to_stockfish = os.path.join(root, file)
 
