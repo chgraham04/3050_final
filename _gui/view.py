@@ -54,7 +54,7 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
     arcade.draw_lbwh_rectangle_filled(x, y, width, height, SIDEPANEL_BG)
 
     # Title
-    arcade.draw_text("BLAHBLAHBLAH", x + width // 2, y + height - 40,
+    arcade.draw_text("CHESS", x + width // 2, y + height - 40,
                      C.WHITE, 20, anchor_x="center", bold=True)
 
     # Current turn
