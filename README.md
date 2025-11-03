@@ -1,4 +1,4 @@
-# 3050_final
+# Interactive Chess Game
 
 Prior to running project:
 
