@@ -91,7 +91,7 @@ def import_stockfish(dir_path="_assets/stockfish"):
                         print(f"Found Stockfish: {path_to_stockfish}")
                         return path_to_stockfish
                     # Unix - look for executable named "stockfish"
-                    if system != "Windows" and file.lower() == 'stockfish':
+                    if system != "Windows" and file.lower() == 'stockfish-macos-m1-apple-silicon':
                         path_to_stockfish = os.path.join(root, file)
                         print("Making file executable...")
                         os.chmod(path_to_stockfish, 0o755)
