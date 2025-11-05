@@ -1,7 +1,6 @@
 ''' Main project executable to trigger gameplay loop, board/piece construction, and bot creation'''
 import arcade
 from _gui.view import GameView
-
 # constants
 def main():
     """ Main function to begin gameplay loop, and call all necessary components"""

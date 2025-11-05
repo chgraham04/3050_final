@@ -21,17 +21,18 @@ class Bot:
                  "d": 3, "e": 4, "f": 5,
                  "g": 6, "h": 7}
         if self.color == Color.WHITE:
-            position = self.stockfish.set_fen_position(fen + " w")
+            fen += " w"
         else:
-            position = self.stockfish.set_fen_position(fen + " b")
-        best_move = self.stockfish.get_best_move(position)
+            fen += " b"
         print(fen)
-        print(self.stockfish.is_fen_valid(fen=fen))
+        self.stockfish.set_fen_position(fen)
+        best_move = self.stockfish.get_best_move()
         print(best_move)
         start_file = files[best_move[0]]
         start_rank = best_move[1]
         move_to_file = files[best_move[2]]
         move_to_rank = best_move[3]
+        print(start_rank, start_file, move_to_rank, move_to_file)
         return [(int(start_rank) - 1, start_file), (int(move_to_rank) - 1, move_to_file)]
 
     def get_color(self):

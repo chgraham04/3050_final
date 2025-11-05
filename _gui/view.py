@@ -11,7 +11,7 @@ from _enums.piece_type import PieceType
 from _assets.spritesheet import Spritesheet, ChessSprites
 from _game.game import Game
 from _bot.bot import Bot
-from _player import Player
+from _player.player import Player
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ = (181, 136, 99)
@@ -135,12 +135,21 @@ class GameView(arcade.View):
             print("SWITCHING TEAMS")
             self.bot.color = Color.WHITE
             self.player.color = Color.BLACK
+
             # Trying black first move
-            print(self.board.board_state())  # Debugging
+            print("hello")
+            print(self.board.board_state())
             bot_moves = self.bot.next_move(
                 fen=self.board.board_state()
             )
             print(bot_moves)
+            self.board.selected_piece = (
+                self.board.grid[bot_moves[0][0]][bot_moves[0][1]]
+                .piece_here
+            )
+            self.bot_open(bot_moves[1][1], bot_moves[1][0])
+            print(self.board.print_board())
+
 
 
     def on_draw(self):
@@ -174,7 +183,7 @@ class GameView(arcade.View):
             if 0 <= file <= 7 and 0 <= rank <= 7:
                 tile = self.board.grid[rank][file]
 
-                if tile.has_piece() and tile.piece_here.color == Color.WHITE:
+                if tile.has_piece() and tile.piece_here.color == self.player.color:
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()
@@ -200,6 +209,7 @@ class GameView(arcade.View):
 
                     self.game.turn = Color.BLACK
 
+                    #ca remove a lot of this code below because move_piece and update sprites handles it?
                     print(self.board.board_state())  # Debugging
                     bot_moves = self.bot.next_move(
                         fen=self.board.board_state()
@@ -210,9 +220,9 @@ class GameView(arcade.View):
                         .piece_here
                     )
 
-                    # self.board.move_piece_and_update_sprites(
-                    #     bot_moves[1][0], bot_moves[1][1]
-                    # )
+                    self.move_piece_and_update_sprites(
+                        bot_moves[1][0], bot_moves[1][1]
+                    )
 
                     self.game.turn = Color.WHITE
 
@@ -257,7 +267,13 @@ class GameView(arcade.View):
                     abs(sprite.center_y - center_y) < self.square // 2):
                 return sprite
         return None
+    def bot_open(self, file, rank):
+        self.board.move_piece(file, rank)
 
+        # Rebuild sprites to show new board state
+        self.sprites.build_from_board(
+            self.board, self.square, self.origin_x, self.origin_y
+        )
     def move_piece_and_update_sprites(self, file, rank):
         """
         Move a piece and update sprite positions.

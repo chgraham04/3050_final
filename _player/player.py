@@ -1,4 +1,4 @@
-from _enums import Color
+from _enums.color import Color
 
 class Player:
     def __init__(self) -> None:
