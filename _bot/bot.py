@@ -14,13 +14,18 @@ class Bot:
         print(f"Using Stockfish at: {stockfish_path}")
         self.stockfish = Stockfish(path=stockfish_path, parameters={"Skill Level": 1})
         self.color = Color.BLACK
+        self.bot_turn = False
         
     def next_move(self, fen: str) -> list[tuple[int, int]]:
         files = {"a": 0, "b": 1, "c": 2,
                  "d": 3, "e": 4, "f": 5,
                  "g": 6, "h": 7}
-        position = self.stockfish.set_fen_position(fen)
+        if self.color == Color.WHITE:
+            position = self.stockfish.set_fen_position(fen + " w")
+        else:
+            position = self.stockfish.set_fen_position(fen + " b")
         best_move = self.stockfish.get_best_move(position)
+        print(fen)
         print(self.stockfish.is_fen_valid(fen=fen))
         print(best_move)
         start_file = files[best_move[0]]
@@ -28,3 +33,9 @@ class Bot:
         move_to_file = files[best_move[2]]
         move_to_rank = best_move[3]
         return [(int(start_rank) - 1, start_file), (int(move_to_rank) - 1, move_to_file)]
+
+    def get_color(self):
+        if self.color == Color.BLACK:
+            return "Black"
+        else:
+            return "White"

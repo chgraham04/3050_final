@@ -6,7 +6,6 @@ from _enums.piece_type import PieceType
 from _enums.color import Color
 from _enums.piece_value import PieceValue
 from _pieces.piece import Piece
-
 @dataclass
 class Bishop(Piece):
     """

@@ -11,7 +11,7 @@ def main():
     screen_width = board_pixels + sidebar_width
     screen_title = "CS3050 Chess"
 
-    # self._board.print_board()
+
     window = arcade.Window(screen_width, screen_height, screen_title)
     view = GameView(screen_width, screen_height, screen_title)
     window.show_view(view)

@@ -3,6 +3,7 @@ GUI view module
 Contains the GameView class which handles rendering and user interaction
 """
 import arcade
+from arcade.gui import UIManager, UIFlatButton
 from arcade import color as C
 from _board.board import Board
 from _enums.color import Color
@@ -10,6 +11,7 @@ from _enums.piece_type import PieceType
 from _assets.spritesheet import Spritesheet, ChessSprites
 from _game.game import Game
 from _bot.bot import Bot
+from _player import Player
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ = (181, 136, 99)
@@ -96,6 +98,7 @@ class GameView(arcade.View):
         self.board = Board()
         self.game = Game()
         self.bot = Bot()
+        self.player = Player()
         self.square = 850 // 8
         self.origin_x = 0
         self.origin_y = (height - self.square * 8) // 2
@@ -117,6 +120,29 @@ class GameView(arcade.View):
         self.drag_offset_x = 0
         self.drag_offset_y = 0
 
+        self.manager = UIManager()
+        self.manager.enable()
+
+        # Create switch color button
+        self.switch_color_button = UIFlatButton(text= "Play as Game as Black", width=175)
+        self.switch_color_button.center_x = 1000
+
+        self.switch_color_button.center_y = 650
+        self.manager.add(self.switch_color_button)
+
+        @self.switch_color_button.event("on_click")
+        def on_click_settings(event):
+            print("SWITCHING TEAMS")
+            self.bot.color = Color.WHITE
+            self.player.color = Color.BLACK
+            # Trying black first move
+            print(self.board.board_state())  # Debugging
+            bot_moves = self.bot.next_move(
+                fen=self.board.board_state()
+            )
+            print(bot_moves)
+
+
     def on_draw(self):
         """ Draw the game board, pieces, and side panel """
         self.clear()
@@ -124,6 +150,7 @@ class GameView(arcade.View):
         self.sprites.draw()
         draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
                        self.window.height, self.game, self.board)
+        self.manager.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         """
@@ -183,9 +210,9 @@ class GameView(arcade.View):
                         .piece_here
                     )
 
-                    self.board.move_piece_and_update_sprites(
-                        bot_moves[1][0], bot_moves[1][1]
-                    )
+                    # self.board.move_piece_and_update_sprites(
+                    #     bot_moves[1][0], bot_moves[1][1]
+                    # )
 
                     self.game.turn = Color.WHITE
 
@@ -357,3 +384,6 @@ class GameView(arcade.View):
         self.drag_start_pos = None
         self.drag_offset_x = 0
         self.drag_offset_y = 0
+
+
+
