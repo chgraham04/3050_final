@@ -63,6 +63,8 @@ class ChessSprites:
         self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
         self._by_piece_id.clear()
 
+        board.remove_prev()
+
         desired_w = square * pad
         scale = desired_w / self.cell_pixel_width  # scale against PNG pixel width
 

@@ -167,6 +167,12 @@ class Board:
         for rank in range(8):
             for file in range(8):
                 self.grid[rank][file].clear_highlight()
+    
+    def remove_prev(self):
+        """Removes all highlighted tiles from the previously made move on the grid"""
+        for rank in range(8):
+            for file in range(8):
+                self.grid[rank][file].clear_prev()
 
     def get_all_enemy_moves(self, color: Color):
         """

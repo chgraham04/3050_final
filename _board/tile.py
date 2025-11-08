@@ -23,6 +23,7 @@ class Tile:
     is_light_square: bool
     piece_here: Optional[Piece] = None
     highlighted: bool = False
+    prev: bool = False
 
     def has_piece(self) -> bool:
         """
@@ -62,6 +63,14 @@ class Tile:
     def clear_highlight(self):
         """Remove highlight from this tile"""
         self.highlighted = False
+
+    def prev_move(self):
+        """ Highlight this tile to indicate that it was the last move made"""
+        self.prev = True
+
+    def clear_prev(self):
+        """ Remove previous move highlight from this tile"""
+        self.prev = False
 
     def get_piece_here(self):
         """

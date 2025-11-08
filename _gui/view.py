@@ -3,6 +3,7 @@ GUI view module
 Contains the GameView class which handles rendering and user interaction
 """
 import arcade
+import time
 from arcade import color as C
 from _board.board import Board
 from _enums.color import Color
@@ -14,6 +15,7 @@ from _bot.bot import Bot
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ = (181, 136, 99)
 HIGHLIGHT_SQ = (118, 150, 86)
+PREV_SQ = (125, 135, 150)
 SIDEPANEL_BG = (50, 50, 50)
 
 
@@ -35,6 +37,9 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
 
             if board.grid[rank][file].highlighted:
                 fill = HIGHLIGHT_SQ
+            
+            if board.grid[rank][file].prev:
+                fill = PREV_SQ
 
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
 
@@ -168,10 +173,14 @@ class GameView(arcade.View):
                 elif tile.highlighted:
                     self.board.remove_highlights()
                     # new function in board
+                    self.board.remove_prev()
                     self.board.move_piece_and_update_sprites(file, rank)
+                    self.board.move_piece_and_update_bot()
                     self.board.print_board()
 
                     self.game.turn = Color.BLACK
+
+                    #Bot turn
 
                     print(self.board.board_state())  # Debugging
                     bot_moves = self.bot.next_move(
@@ -186,6 +195,9 @@ class GameView(arcade.View):
                     self.board.move_piece_and_update_sprites(
                         bot_moves[1][0], bot_moves[1][1]
                     )
+
+                    self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
+                    self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
 
                     self.game.turn = Color.WHITE
 
@@ -239,6 +251,7 @@ class GameView(arcade.View):
             file: Target file (0-7)
             rank: Target rank (0-7)
         """
+
         # Pawn at end of board (promotion)
         piece = self.board.grid[rank][file].piece_here
         if (piece and piece.piece_type == PieceType.PAWN and
@@ -265,17 +278,24 @@ class GameView(arcade.View):
         self.board.print_board()
         self.game.turn = Color.BLACK
 
+    def move_piece_and_update_bot(self):
+        """ Moves the bot """
         # Bot's turn
         bot_moves = self.bot.next_move(fen=self.board.board_state())
         self.board.selected_piece = (
             self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
         )
         self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
+        self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
+        self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
 
         # Rebuild sprites again after bot move
+        #self.wait()
         self.sprites.build_from_board(
             self.board, self.square, self.origin_x, self.origin_y
         )
+        self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
+        self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
 
         # User currently hardcoded as white
         self.game.turn = Color.WHITE
@@ -352,8 +372,19 @@ class GameView(arcade.View):
                 self.drag_offset_x = 0
                 self.drag_offset_y = 0
                 return
+        
+        self.move_piece_and_update_bot()
 
         self.dragging_sprite = None
         self.drag_start_pos = None
         self.drag_offset_x = 0
         self.drag_offset_y = 0
+    
+    def wait(self):
+        """ Function waits a second prior to making bot move """
+        counter = 1
+        start = time.time()
+        while time.time() < start + 2:
+            pass
+
+
