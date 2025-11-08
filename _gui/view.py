@@ -34,12 +34,12 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
             x = origin_x + file * square
             y = origin_y + rank * square
             fill = LIGHT_SQ if board.grid[rank][file].is_light_square else DARK_SQ
-
-            if board.grid[rank][file].highlighted:
-                fill = HIGHLIGHT_SQ
             
             if board.grid[rank][file].prev:
                 fill = PREV_SQ
+            
+            if board.grid[rank][file].highlighted:
+                fill = HIGHLIGHT_SQ
 
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
 
