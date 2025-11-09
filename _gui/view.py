@@ -343,6 +343,7 @@ class GameView(arcade.View):
                     # Valid move
                     self.board.remove_highlights()
                     self.move_piece_and_update_sprites(file, rank)
+                    self.move_piece_and_update_bot()
                 else:
                     # Invalid move - snap back to original position
                     orig_file, orig_rank = self.drag_start_pos
@@ -373,7 +374,7 @@ class GameView(arcade.View):
                 self.drag_offset_y = 0
                 return
         
-        self.move_piece_and_update_bot()
+        
 
         self.dragging_sprite = None
         self.drag_start_pos = None
