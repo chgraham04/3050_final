@@ -279,6 +279,10 @@ class GameView(arcade.View):
         self.game.turn = Color.BLACK
 
     def move_piece_and_update_bot(self):
+
+        if not self.board.is_curr_pos():
+            return
+        
         """ Moves the bot """
         # Bot's turn
         bot_moves = self.bot.next_move(fen=self.board.board_state())
@@ -387,5 +391,32 @@ class GameView(arcade.View):
         start = time.time()
         while time.time() < start + 2:
             pass
+    
+    def on_key_press(self, symbol, modifiers):
+        ''' 
+        Handles reactions to key press events
+        
+        Args:
+            symbol: which key was pressed
+            modifiers: active keyboard modifiers
+        '''
+        if symbol == arcade.key.DOWN:
+            self.show_prev_move()
+        if symbol == arcade.key.UP:
+            self.show_next_move()
 
+    def show_prev_move(self):
+        ''' Goes backwards one move in history'''
+        if self.board.current_index > 0:
+            self.board.current_index -= 1
+            move = self.board.move_history[self.board.current_index]
+            self.board.load_fen(move["FEN"])
+            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
 
+    def show_next_move(self):
+        ''' Goes forward one move in history '''
+        if self.board.current_index < len(self.board.move_history) - 1:
+            self.board.current_index += 1
+            move = self.board.move_history[self.board.current_index]
+            self.board.load_fen(move["FEN"])
+            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)

@@ -26,6 +26,8 @@ class Board:
         self.selected_piece = None
         self.checking_for_checks = False
         self.en_passant_target = None
+        self.move_history = []
+        self.current_index = -1
         self.material_differential = 0
 
         # assign tile objects to None lists
@@ -71,11 +73,25 @@ class Board:
         self.grid[7][2].piece_here = Bishop(Color.BLACK, (2, 7))
         self.grid[7][5].piece_here = Bishop(Color.BLACK, (5, 7))
 
+        #Sets initial board layout in previous move shower
+        self.move_history.append( {
+            "Piece": None,
+            "From": None,
+            "To": None,
+            "Captured": None,
+            "FEN": self.board_state()
+        })
+        self.current_index = len(self.move_history) - 1
+
     def move_piece(self, file, rank):
         """
         Move the selected piece to the specified file and rank.
         Handles special moves like castling and updates _board state.
         """
+
+        if not self.is_curr_pos():
+            return
+
         before_move = self.selected_piece.get_position()
         before_move_rank = before_move[1]
         before_move_file = before_move[0]
@@ -148,6 +164,17 @@ class Board:
         print(f"{piece.color} {piece.piece_type} moved from "
               f"{before_move} to {(file, rank)}")
 
+        #Add move to the move history list
+        self.move_history.append( {
+            "Piece": piece,
+            "From": before_move,
+            "To": (file, rank),
+            "Captured": captured_piece,
+            "FEN": self.board_state()
+        })
+
+        #Store the current position in move history
+        self.current_index = len(self.move_history) - 1
         self.selected_piece = None
 
     def get_piece(self, piece: Piece):
@@ -395,6 +422,7 @@ class Board:
                             fen_row += symbol.lower()
             fen_string += (fen_row + "/")
         fen_string = fen_string[:-1]
+        #print(fen_string)
         return fen_string
     
     def calculate_material(self):
@@ -422,9 +450,72 @@ class Board:
                     black_total += value
 
         return white_total - black_total
+    
+    def load_fen(self, fen):
+        ''' 
+        Reset the board to the position described by a FEN string
+        
+        Args:
+            fen: fen representation of board layout      
+        '''
+
+        for file in range(8):
+            for rank in range(8):
+
+                #Check if tile is light
+                is_light = (rank + file) % 2 == 1
+
+                #Recreate the tiles
+                self.grid[rank][file] = Tile(file, rank, is_light)
+        
+        #Split fen string apart per row
+        rank_rows = fen.split('/')
+
+        #Iterate through ranks and files
+        for rank_index, row in enumerate(reversed(rank_rows)):
+            file_index = 0
+
+            #Find empty squares
+            for char in row:
+                if char.isdigit():
+                    file_index += int(char)
+                
+                #If not digit, there is a piece here
+                else:
+                    color = Color.WHITE if char.isupper() else Color.BLACK
+                    piece_type_char = char.lower()
+
+                    #Place piece
+                    piece_class = {
+                        'p': Pawn,
+                        'r': Rook,
+                        'n': Knight,
+                        'b': Bishop,
+                        'q': Queen,
+                        'k': King
+                    }[piece_type_char]
+
+                    piece = piece_class(color, (file_index, rank_index))
+
+                    #Handle has_moved for pawn
+                    if isinstance(piece, Pawn):
+                        if (piece.color == Color.WHITE and rank_index != 1) or (piece.color == Color.BLACK and rank_index != 6):
+                            piece.has_moved = True
+                    
+                    #TODO - implement has_moved for rook and king as well
+
+                    self.grid[rank_index][file_index].piece_here = piece
+                    file_index += 1
+
+        #Calculate previous material difference
+        self.material_differential =self.calculate_material()
 
     def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
         """Handle mouse release events (placeholder for future implementation)"""
 
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         """Handle mouse motion events (placeholder for future implementation)"""
+
+    def is_curr_pos(self):
+        """ Check if board displays current move """
+        return self.current_index == len(self.move_history) - 1
