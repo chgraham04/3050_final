@@ -254,8 +254,7 @@ class Board:
         for rank in range(8):
             for file in range(8):
                 piece = self.grid[rank][file].piece_here
-                if (piece and piece.color != color and
-                        piece.piece_type != PieceType.KING):
+                if (piece and piece.color != color):
                     curr = self.get_all_legal(piece)
 
                     for move in curr:
