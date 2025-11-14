@@ -106,3 +106,12 @@ class Piece:
         self._destination_point = destination_point
         self.change_x = 0.0
         self.change_y = 0.0
+    
+    def promote(self):
+        """
+        Promote a pawn to a queen
+        """
+        if self.piece_type == PieceType.PAWN:
+            self.piece_type = PieceType.QUEEN
+            self.piece_value = PieceValue.QUEEN
+

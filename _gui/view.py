@@ -301,15 +301,7 @@ class GameView(arcade.View):
         
         #Check if white in checkmate
 
-
-        # Pawn at end of board (promotion)
-        piece = self.board.grid[rank][file].piece_here
-        if (piece and piece.piece_type == PieceType.PAWN and
-                rank == 7 and piece.color == Color.WHITE):
-            piece = self.board.grid[rank][file].piece_here
-            piece.piece_type = PieceType.QUEEN
-            self.board.grid[rank][file].piece_here = piece
-
+        #Handle captures
         piece = self.board.grid[rank][file].piece_here
         if piece:
             captured_piece = piece
@@ -318,6 +310,14 @@ class GameView(arcade.View):
 
         # Move piece on board and update sprite positions
         self.board.move_piece(file, rank)
+
+        # Pawn at end of board (promotion)
+        piece = self.board.grid[rank][file].get_piece_here()
+        if (piece and piece.piece_type == PieceType.PAWN and
+                rank == 7 and piece.color == Color.WHITE):
+            print("WHITE PAWN PROMOTED!")
+            piece.promote()
+            self.board.promote(rank, file)
 
         # Rebuild sprites to show new board state
         self.sprites.build_from_board(
@@ -374,6 +374,7 @@ class GameView(arcade.View):
             self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
         )
         self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
+
         self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
         self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
 
