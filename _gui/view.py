@@ -63,18 +63,33 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
                      C.WHITE, 20, anchor_x="center", bold=True)
 
     # Current turn
-    turn_text = "White's Turn" if game.turn == Color.WHITE else "Black's Turn"
+    if board.stalemate == False and board.checkmate == False:
+        turn_text = "White's Turn" if game.turn == Color.WHITE else "Black's Turn"
+    elif board.stalemate == True:
+        turn_text = "Stalemate!"
+    else: #checkmate
+        turn_text = "Checkmate!"
+
     arcade.draw_text(turn_text, x + width // 2, y + height - 80,
                      C.WHITE, 16, anchor_x="center")
 
     material_diff = board.material_differential
     # print(f"DEBUG draw_sidepanel: material diff = {material_diff}")
-    if material_diff > 0:
-        material_msg = f"White + {material_diff}"
-    elif material_diff < 0:
-        material_msg = f"Black + {abs(material_diff)}"
-    else:
-        material_msg = f"Even Material"
+    if board.checkmate == False and board.stalemate == False:
+        if material_diff > 0:
+            material_msg = f"White + {material_diff}"
+        elif material_diff < 0:
+            material_msg = f"Black + {abs(material_diff)}"
+        else:
+            material_msg = f"Even Material"
+    elif board.checkmate == True:
+        if board.mate_color == Color.WHITE:
+            material_msg = f"White Wins!"
+        else:
+            material_msg = f"Black Wins!"
+    else: 
+        #Stalemate
+        material_msg = f"Draw :/"
 
     arcade.draw_text(material_msg, x + width // 2, y + height - 120,
                      C.WHITE, 14, anchor_x="center")
@@ -140,6 +155,10 @@ class GameView(arcade.View):
             button: Which mouse button was pressed
             key_modifiers: Active keyboard modifiers
         """
+
+        if self.board.checkmate or self.board.stalemate:
+            return 
+        
         if button == arcade.MOUSE_BUTTON_LEFT:
             # Required by python arcade, needed to pass pylint
             # no functionality currently
@@ -157,6 +176,31 @@ class GameView(arcade.View):
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()
 
+                    #Check if checkmate or stalemate
+                    piece = tile.get_piece_here()
+                    if piece.piece_type == PieceType.KING:
+                        king_moves = self.board.get_all_legal(piece)
+                        if len(king_moves) == 0:
+
+                            #Check if anyone has moves
+                            all_moves = self.board.get_all_moves(Color.WHITE)
+                            if len(all_moves) == 0:
+
+                                #Checkmate or stalemate
+                                enemy_moves = self.board.get_all_enemy_moves(Color.WHITE)
+
+                                if piece.current_pos in enemy_moves: #Checkmate
+                                    print("WHITE is in CHECKMATE")
+                                    self.board.set_checkmate()
+                                    self.board.set_mate_color(Color.BLACK)
+                                    return 
+                                
+                                else:
+                                    #Stalemate
+                                    print("WHITE is in STALEMATE")
+                                    self.board.set_stalemate()
+                                    return
+                    
                     # Start dragging the sprite
                     sprite = self.get_sprite_at_position(file, rank)
                     if sprite:
@@ -252,6 +296,12 @@ class GameView(arcade.View):
             rank: Target rank (0-7)
         """
 
+        if self.board.checkmate or self.board.stalemate:
+            return
+        
+        #Check if white in checkmate
+
+
         # Pawn at end of board (promotion)
         piece = self.board.grid[rank][file].piece_here
         if (piece and piece.piece_type == PieceType.PAWN and
@@ -282,6 +332,40 @@ class GameView(arcade.View):
 
         if not self.board.is_curr_pos():
             return
+        
+        if self.board.checkmate or self.board.stalemate:
+            return
+        
+        #TODO: update to work various of colors
+        move_list = self.board.get_all_enemy_moves(color=Color.BLACK)
+        if len(move_list) == 0:
+            #Stalemate or checkmate
+
+            #Get all player moves
+            all_moves = self.board.get_all_moves()
+
+            #Get position of king
+            for rank in range(8):
+                for file in range(8):
+                    piece = self.board.grid[rank][file].piece_here
+
+                    if (piece and piece.color == Color.WHITE and piece.piece_type == PieceType.KING):
+
+                        #If king in moves (checkmate)
+                        if self.board.grid[rank][file] in all_moves:
+
+                            #Checkmate
+                            print("BLACK is in CHECKMATE")
+                            self.board.set_checkmate()
+                            self.board.set_mate_color(Color.WHITE)
+                            #call function to display that
+                            return
+                        else:
+                            print("BLACK is in STALEMATE")
+                            self.board.set_stalemate()
+                            #call function to display that
+                            return
+
         
         """ Moves the bot """
         # Bot's turn

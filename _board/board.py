@@ -29,6 +29,9 @@ class Board:
         self.move_history = []
         self.current_index = -1
         self.material_differential = 0
+        self.checkmate = False
+        self.stalemate = False
+        self.mate_color = None
 
         # assign tile objects to None lists
         for rank in range(8):
@@ -181,6 +184,17 @@ class Board:
         """Set the currently selected piece"""
         self.selected_piece = piece
 
+    def set_checkmate(self):
+        """ Set the checkmate condition to true """
+        self.checkmate = True
+
+    def set_stalemate(self):
+        """ Set the stalemate condition to true """
+        self.stalemate = True
+
+    def set_mate_color(self, color: Color):
+        self.mate_color = color
+
     def highlight_moves(self):
         """Highlight all legal moves for the currently selected piece"""
         # ensure a piece is selected
@@ -201,6 +215,30 @@ class Board:
             for file in range(8):
                 self.grid[rank][file].clear_prev()
 
+    def get_all_moves(self, color: Color):
+        """
+        Get all possible moves for pieces of the player color.
+
+        Args:
+            color: The color of the player
+        Returns:
+            List of all possible player move positions
+        """
+        all_moves = []
+
+        #Get moves for each piece
+        for rank in range(8):
+            for file in range(8):
+                piece = self.grid[rank][file].piece_here
+                if (piece and piece.color == color):
+                    curr = self.get_all_legal(piece)
+
+                    for move in curr:
+                        if move not in all_moves:
+                            all_moves.append(move)
+        
+        return all_moves
+
     def get_all_enemy_moves(self, color: Color):
         """
         Get all possible moves for pieces of the opposite color.
@@ -218,7 +256,7 @@ class Board:
                 piece = self.grid[rank][file].piece_here
                 if (piece and piece.color != color and
                         piece.piece_type != PieceType.KING):
-                    curr = piece.get_moves(self)
+                    curr = self.get_all_legal(piece)
 
                     for move in curr:
                         if move not in all_moves:
