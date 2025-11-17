@@ -24,6 +24,7 @@ class Tile:
     piece_here: Optional[Piece] = None
     highlighted: bool = False
     prev: bool = False
+    clicked: bool = False
 
     def has_piece(self) -> bool:
         """
@@ -71,6 +72,12 @@ class Tile:
     def clear_prev(self):
         """ Remove previous move highlight from this tile"""
         self.prev = False
+    
+    def click(self):
+        self.clicked = True
+    
+    def clear_click(self):
+        self.clicked = False
 
     def get_piece_here(self):
         """

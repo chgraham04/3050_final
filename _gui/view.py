@@ -17,6 +17,7 @@ DARK_SQ = (181, 136, 99)
 HIGHLIGHT_SQ = (118, 150, 86)
 PREV_SQ = (125, 135, 150)
 SIDEPANEL_BG = (50, 50, 50)
+CLICK_SQ = (255, 165, 0)
 
 
 def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
@@ -40,6 +41,9 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
             
             if board.grid[rank][file].highlighted:
                 fill = HIGHLIGHT_SQ
+
+            if board.grid[rank][file].clicked:
+                fill = CLICK_SQ
 
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
 
@@ -248,6 +252,23 @@ class GameView(arcade.View):
                 else:
                     self.board.selected_piece = None
                     self.board.remove_highlights()
+        
+        elif button == arcade.MOUSE_BUTTON_RIGHT:
+
+            if modifiers & arcade.key.MOD_SHIFT:
+                pass
+
+            file = int((x - self.origin_x) // self.square)
+            rank = int((y - self.origin_y) // self.square)
+
+            if 0 <= file <= 7 and 0 <= rank <= 7:
+                tile = self.board.grid[rank][file]
+
+                if tile.clicked:
+                    tile.clear_click()
+                else:
+                    tile.click()
+
 
     def get_tile_from_mouse(self, x, y):
         """
