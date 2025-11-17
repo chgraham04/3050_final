@@ -557,7 +557,7 @@ class Board:
         """ Check if board displays current move """
         return self.current_index == len(self.move_history) - 1
     
-    def promote(self, rank, file):
+    def promote(self, color, file, rank):
         """ 
         Create a new instance of a queen wherever a pawn is promoted
         
@@ -565,5 +565,5 @@ class Board:
             Rank: the rank of the pawn/queen
             File: the file of the pawn/queen
         """
-        self.grid[rank][file].piece_here = Queen(Color.WHITE, (rank, file))
+        self.grid[rank][file].piece_here = Queen(color, (file, rank))
 

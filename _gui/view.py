@@ -317,7 +317,8 @@ class GameView(arcade.View):
                 rank == 7 and piece.color == Color.WHITE):
             print("WHITE PAWN PROMOTED!")
             piece.promote()
-            self.board.promote(rank, file)
+            self.board.promote(Color.WHITE, file, rank)
+        
 
         # Rebuild sprites to show new board state
         self.sprites.build_from_board(
@@ -330,29 +331,31 @@ class GameView(arcade.View):
 
     def move_piece_and_update_bot(self):
 
+        #Prevent playing from old moves
         if not self.board.is_curr_pos():
             return
         
+        #Prevent playing in checkmate or stalemate
         if self.board.checkmate or self.board.stalemate:
             return
         
         #TODO: update to work various of colors
-        move_list = self.board.get_all_enemy_moves(color=Color.BLACK)
+        move_list = self.board.get_all_moves(color = Color.BLACK)
         if len(move_list) == 0:
             #Stalemate or checkmate
 
             #Get all player moves
-            all_moves = self.board.get_all_moves()
+            all_moves = self.board.get_all_enemy_moves(color = Color.BLACK)
 
             #Get position of king
             for rank in range(8):
                 for file in range(8):
                     piece = self.board.grid[rank][file].piece_here
 
-                    if (piece and piece.color == Color.WHITE and piece.piece_type == PieceType.KING):
+                    if (piece and piece.color == Color.BLACK and piece.piece_type == PieceType.KING):
 
                         #If king in moves (checkmate)
-                        if self.board.grid[rank][file] in all_moves:
+                        if piece.current_pos in all_moves:
 
                             #Checkmate
                             print("BLACK is in CHECKMATE")
@@ -374,6 +377,15 @@ class GameView(arcade.View):
             self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
         )
         self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
+
+        final_rank = bot_moves[1][0]
+        final_file = bot_moves[1][1]
+        piece = self.board.grid[final_rank][final_file].piece_here
+
+        if piece and piece.piece_type == PieceType.PAWN and final_rank == 0 and piece.color == Color.BLACK:
+            print("BLACK PAWN PROMOTED@")
+            piece.promote()
+            self.board.promote(Color.BLACK, final_file, final_rank)
 
         self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
         self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()

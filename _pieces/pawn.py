@@ -59,57 +59,99 @@ class Pawn(Piece):
         Returns:
             List of legal move positions as (file, rank) tuples
         """
-        legal_moves = []
-        position = self.current_pos
 
-        if self.color == Color.WHITE:
-            direction = 1
-        else:
-            direction = -1
+        if self.piece_type == PieceType.PAWN:
+            legal_moves = []
+            position = self.current_pos
 
-        regular_move = (0, direction)
-        first_move = (0, 2 * direction)
-        takes = [(1, direction), (-1, direction)]
-        en_passant_moves = [(-1, 0), (1, 0)]
+            if self.color == Color.WHITE:
+                direction = 1
+            else:
+                direction = -1
 
-        # Check for standard move
-        check_square = (position[0] + regular_move[0], position[1] + regular_move[1])
+            regular_move = (0, direction)
+            first_move = (0, 2 * direction)
+            takes = [(1, direction), (-1, direction)]
+            en_passant_moves = [(-1, 0), (1, 0)]
 
-        if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
-            tile = board.grid[check_square[1]][check_square[0]]
-
-            if not tile.has_piece():
-                legal_moves.append(check_square)
-
-        # Check for first move
-        if not self.has_moved:
-            check_square = (position[0] + first_move[0], position[1] + first_move[1])
-            check_empty = (position[0], position[1] + direction)
+            # Check for standard move
+            check_square = (position[0] + regular_move[0], position[1] + regular_move[1])
 
             if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
                 tile = board.grid[check_square[1]][check_square[0]]
-                empty_tile = board.grid[check_empty[1]][check_empty[0]]
 
-                if not tile.has_piece() and not empty_tile.has_piece():
+                if not tile.has_piece():
                     legal_moves.append(check_square)
 
-        # Check for takes
-        for x, y in takes:
-            check_square = (position[0] + x, position[1] + y)
+            # Check for first move
+            if not self.has_moved:
+                check_square = (position[0] + first_move[0], position[1] + first_move[1])
+                check_empty = (position[0], position[1] + direction)
 
-            # Ensure square is within bounds and not a friendly piece
-            if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
-                tile = board.grid[check_square[1]][check_square[0]]
+                if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
+                    tile = board.grid[check_square[1]][check_square[0]]
+                    empty_tile = board.grid[check_empty[1]][check_empty[0]]
 
-                # See what piece is on the board; from tile.py
-                if tile.has_piece() and tile.is_other_color(self.color):
+                    if not tile.has_piece() and not empty_tile.has_piece():
+                        legal_moves.append(check_square)
+
+            # Check for takes
+            for x, y in takes:
+                check_square = (position[0] + x, position[1] + y)
+
+                # Ensure square is within bounds and not a friendly piece
+                if 0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7:
+                    tile = board.grid[check_square[1]][check_square[0]]
+
+                    # See what piece is on the board; from tile.py
+                    if tile.has_piece() and tile.is_other_color(self.color):
+                        legal_moves.append(check_square)
+
+            # Check for en passant
+            for x, y in en_passant_moves:
+                check_square = (position[0] + x, position[1] + y)
+
+                if check_square == board.en_passant_target:
+                    legal_moves.append((check_square[0], check_square[1] + direction))
+
+            return legal_moves
+        
+        #For promotion
+        if self.piece_type == PieceType.QUEEN:
+            legal_moves = []
+            position = self.current_pos
+
+            # Potential moves
+            possibilities = [
+                (0, 1),
+                (0, -1),
+                (1, 0),
+                (-1, 0),
+                (1, 1),
+                (1, -1),
+                (-1, 1),
+                (-1, -1),
+            ]
+
+            for x_pos, y_pos in possibilities:
+                counter = 1
+
+                while True:
+                    check_square = position[0] + x_pos * counter, position[1] + y_pos * counter
+
+                    # Ensure square is within bounds of board
+                    if not (0 <= check_square[0] <= 7 and 0 <= check_square[1] <= 7):
+                        break
+
+                    tile = board.grid[check_square[1]][check_square[0]]
+
+                    if tile is not None and tile.has_piece():
+                        if tile.is_same_color(self.color):
+                            break
+                        legal_moves.append(check_square)
+                        break
+
                     legal_moves.append(check_square)
+                    counter += 1
 
-        # Check for en passant
-        for x, y in en_passant_moves:
-            check_square = (position[0] + x, position[1] + y)
-
-            if check_square == board.en_passant_target:
-                legal_moves.append((check_square[0], check_square[1] + direction))
-
-        return legal_moves
+            return legal_moves
