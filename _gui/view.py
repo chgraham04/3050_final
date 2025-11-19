@@ -20,7 +20,7 @@ SIDEPANEL_BG = (50, 50, 50)
 CLICK_SQ = (255, 165, 0)
 
 
-def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
+def draw_board(board: Board, origin_x: int, origin_y: int, square: int, user_color: Color):
     """
     Draw the chess board with all tiles
 
@@ -29,16 +29,25 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int):
         origin_x: X coordinate of board origin
         origin_y: Y coordinate of board origin
         square: Size of each square in pixels
+        user_color: The color the user is playing (affects board orientation)
     """
     for rank in range(8):
         for file in range(8):
-            x = origin_x + file * square
-            y = origin_y + rank * square
+            # Transform coordinates based on user color
+            if user_color == Color.BLACK:
+                visual_file = 7 - file
+                visual_rank = 7 - rank
+            else:
+                visual_file = file
+                visual_rank = rank
+
+            x = origin_x + visual_file * square
+            y = origin_y + visual_rank * square
             fill = LIGHT_SQ if board.grid[rank][file].is_light_square else DARK_SQ
-            
+
             if board.grid[rank][file].prev:
                 fill = PREV_SQ
-            
+
             if board.grid[rank][file].highlighted:
                 fill = HIGHLIGHT_SQ
 
@@ -58,6 +67,7 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
         width: Width of panel
         height: Height of panel
         game: The Game object containing game state
+        board: The Board object containing board state
     """
     # Background
     arcade.draw_lbwh_rectangle_filled(x, y, width, height, SIDEPANEL_BG)
@@ -78,7 +88,6 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
                      C.WHITE, 16, anchor_x="center")
 
     material_diff = board.material_differential
-    # print(f"DEBUG draw_sidepanel: material diff = {material_diff}")
     if board.checkmate == False and board.stalemate == False:
         if material_diff > 0:
             material_msg = f"White + {material_diff}"
@@ -91,12 +100,38 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
             material_msg = f"White Wins!"
         else:
             material_msg = f"Black Wins!"
-    else: 
+    else:
         #Stalemate
         material_msg = f"Draw :/"
 
     arcade.draw_text(material_msg, x + width // 2, y + height - 120,
                      C.WHITE, 14, anchor_x="center")
+
+    # Color selection label and button
+    arcade.draw_text("User plays as:", x + width // 2, y + 80,
+                     C.WHITE, 14, anchor_x="center")
+
+    # Button dimensions
+    button_width = 80
+    button_height = 40
+    button_x = x + width // 2 - button_width // 2
+    button_y = y + 30
+
+    # Button color based on user selection
+    if game.user_color == Color.WHITE:
+        button_fill = C.WHITE
+        button_text_color = C.BLACK
+        button_text = "WHITE"
+    else:
+        button_fill = C.BLACK
+        button_text_color = C.WHITE
+        button_text = "BLACK"
+
+    # Draw button
+    arcade.draw_lbwh_rectangle_filled(button_x, button_y, button_width, button_height, button_fill)
+    arcade.draw_lbwh_rectangle_outline(button_x, button_y, button_width, button_height, C.GRAY, 2)
+    arcade.draw_text(button_text, x + width // 2, button_y + button_height // 2,
+                     button_text_color, 12, anchor_x="center", anchor_y="center", bold=True)
 
 class GameView(arcade.View):
     """
@@ -141,10 +176,44 @@ class GameView(arcade.View):
         self.drag_offset_x = 0
         self.drag_offset_y = 0
 
+        """
+        Added game_started flag to track if first move has been made.
+        This allows bot to make first move when user plays BLACK.
+        """
+        self.game_started = False
+
+    def screen_to_board_coords(self, visual_file: int, visual_rank: int) -> tuple[int, int]:
+        """
+        Convert visual screen coordinates to actual board coordinates.
+
+        Args:
+            visual_file: File coordinate on screen (0-7)
+            visual_rank: Rank coordinate on screen (0-7)
+        Returns:
+            Tuple of (actual_file, actual_rank) on the board
+        """
+        if self.game.user_color == Color.BLACK:
+            return (7 - visual_file, 7 - visual_rank)
+        return (visual_file, visual_rank)
+
+    def board_to_screen_coords(self, board_file: int, board_rank: int) -> tuple[int, int]:
+        """
+        Convert actual board coordinates to visual screen coordinates.
+
+        Args:
+            board_file: File coordinate on board (0-7)
+            board_rank: Rank coordinate on board (0-7)
+        Returns:
+            Tuple of (visual_file, visual_rank) for screen display
+        """
+        if self.game.user_color == Color.BLACK:
+            return (7 - board_file, 7 - board_rank)
+        return (board_file, board_rank)
+
     def on_draw(self):
         """ Draw the game board, pieces, and side panel """
         self.clear()
-        draw_board(self.board, self.origin_x, self.origin_y, self.square)
+        draw_board(self.board, self.origin_x, self.origin_y, self.square, self.game.user_color)
         self.sprites.draw()
         draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
                        self.window.height, self.game, self.board)
@@ -161,21 +230,49 @@ class GameView(arcade.View):
         """
 
         if self.board.checkmate or self.board.stalemate:
-            return 
-        
+            return
+
+        # Check if color selection button was clicked
+        button_width = 80
+        button_height = 40
+        button_x = self.sidepanel_x + self.sidepanel_width // 2 - button_width // 2
+        button_y = 30
+
+        if (button_x <= x <= button_x + button_width and
+            button_y <= y <= button_y + button_height):
+            # Toggle user color
+            self.game.user_color = Color.BLACK if self.game.user_color == Color.WHITE else Color.WHITE
+            # Reset the game
+            self.board = Board()
+            self.game.turn = Color.WHITE  # Fixed: Use Color.WHITE enum, not C.WHITE
+            self.game_started = False
+            self.sprites.build_from_board(
+                self.board, self.square, self.origin_x, self.origin_y, self.game.user_color
+            )
+
+            # If user chose black, bot makes first move
+            if self.game.user_color == Color.BLACK:
+                self.make_bot_move()
+                self.game.turn = self.game.user_color  # Set turn to user (BLACK)
+                self.game_started = True
+            return
+
         if button == arcade.MOUSE_BUTTON_LEFT:
             # Required by python arcade, needed to pass pylint
             # no functionality currently
             if modifiers & arcade.key.MOD_SHIFT:
                 pass
 
-            file = int((x - self.origin_x) // self.square)
-            rank = int((y - self.origin_y) // self.square)
+            visual_file = int((x - self.origin_x) // self.square)
+            visual_rank = int((y - self.origin_y) // self.square)
+
+            # Convert visual coordinates to actual board coordinates
+            file, rank = self.screen_to_board_coords(visual_file, visual_rank)
 
             if 0 <= file <= 7 and 0 <= rank <= 7:
                 tile = self.board.grid[rank][file]
 
-                if tile.has_piece() and tile.piece_here.color == Color.WHITE:
+                if tile.has_piece() and tile.piece_here.color == self.game.user_color:
                     self.board.remove_highlights()
                     self.board.get_piece(tile.piece_here)
                     self.board.highlight_moves()
@@ -187,24 +284,24 @@ class GameView(arcade.View):
                         if len(king_moves) == 0:
 
                             #Check if anyone has moves
-                            all_moves = self.board.get_all_moves(Color.WHITE)
+                            all_moves = self.board.get_all_moves(self.game.user_color)
                             if len(all_moves) == 0:
 
                                 #Checkmate or stalemate
-                                enemy_moves = self.board.get_all_enemy_moves(Color.WHITE)
+                                enemy_moves = self.board.get_all_enemy_moves(self.game.user_color)
 
                                 if piece.current_pos in enemy_moves: #Checkmate
-                                    print("WHITE is in CHECKMATE")
+                                    print(f"{self.game.user_color.name} is in CHECKMATE")
                                     self.board.set_checkmate()
-                                    self.board.set_mate_color(Color.BLACK)
-                                    return 
-                                
+                                    self.board.set_mate_color(self.game.user_color.opposite())
+                                    return
+
                                 else:
                                     #Stalemate
-                                    print("WHITE is in STALEMATE")
+                                    print(f"{self.game.user_color.name} is in STALEMATE")
                                     self.board.set_stalemate()
                                     return
-                    
+
                     # Start dragging the sprite
                     sprite = self.get_sprite_at_position(file, rank)
                     if sprite:
@@ -215,51 +312,31 @@ class GameView(arcade.View):
                         self.drag_offset_x = x - sprite.center_x
                         self.drag_offset_y = y - sprite.center_y
 
-                elif self.game.turn == Color.BLACK:
+                elif self.game.turn != self.game.user_color:
                     print("Not your turn")
 
                 elif tile.highlighted:
                     self.board.remove_highlights()
-                    # new function in board
                     self.board.remove_prev()
-                    self.board.move_piece_and_update_sprites(file, rank)
-                    self.board.move_piece_and_update_bot()
+                    self.move_piece_and_update_sprites(file, rank)
                     self.board.print_board()
 
-                    self.game.turn = Color.BLACK
-
-                    #Bot turn
-
-                    print(self.board.board_state())  # Debugging
-                    bot_moves = self.bot.next_move(
-                        fen=self.board.board_state()
-                    )
-
-                    self.board.selected_piece = (
-                        self.board.grid[bot_moves[0][0]][bot_moves[0][1]]
-                        .piece_here
-                    )
-
-                    self.board.move_piece_and_update_sprites(
-                        bot_moves[1][0], bot_moves[1][1]
-                    )
-
-                    self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
-                    self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
-
-                    self.game.turn = Color.WHITE
+                    self.game.turn = self.game.user_color.opposite()
+                    self.make_bot_move()
+                    self.game.turn = self.game.user_color
 
                 else:
                     self.board.selected_piece = None
                     self.board.remove_highlights()
-        
+
         elif button == arcade.MOUSE_BUTTON_RIGHT:
 
             if modifiers & arcade.key.MOD_SHIFT:
                 pass
 
-            file = int((x - self.origin_x) // self.square)
-            rank = int((y - self.origin_y) // self.square)
+            visual_file = int((x - self.origin_x) // self.square)
+            visual_rank = int((y - self.origin_y) // self.square)
+            file, rank = self.screen_to_board_coords(visual_file, visual_rank)
 
             if 0 <= file <= 7 and 0 <= rank <= 7:
                 tile = self.board.grid[rank][file]
@@ -269,6 +346,23 @@ class GameView(arcade.View):
                 else:
                     tile.click()
 
+
+    def make_bot_move(self):
+        """Make the bot's move and update the display"""
+        bot_color = self.game.user_color.opposite()
+        move = self.bot.make_move(self.board, bot_color)
+
+        if move:
+            from_pos, to_pos = move
+
+            # Rebuild sprites to show new board state
+            self.sprites.build_from_board(
+                self.board, self.square, self.origin_x, self.origin_y, self.game.user_color
+            )
+
+            # Highlight the bot's move (from and to squares)
+            self.board.grid[from_pos[0]][from_pos[1]].prev_move()
+            self.board.grid[to_pos[0]][to_pos[1]].prev_move()
 
     def get_tile_from_mouse(self, x, y):
         """
@@ -280,8 +374,10 @@ class GameView(arcade.View):
         Returns:
             Tuple of (file, rank) or (None, None) if outside board
         """
-        file = int((x - self.origin_x) // self.square)
-        rank = int((y - self.origin_y) // self.square)
+        visual_file = int((x - self.origin_x) // self.square)
+        visual_rank = int((y - self.origin_y) // self.square)
+
+        file, rank = self.screen_to_board_coords(visual_file, visual_rank)
 
         if 0 <= file <= 7 and 0 <= rank <= 7:
             return file, rank
@@ -297,9 +393,12 @@ class GameView(arcade.View):
         Returns:
             The sprite at that position, or None if not found
         """
+        # Convert board coordinates to visual coordinates for sprite positioning
+        visual_file, visual_rank = self.board_to_screen_coords(file, rank)
+
         # Calculate the center of the square
-        center_x = self.origin_x + file * self.square + self.square // 2
-        center_y = self.origin_y + rank * self.square + self.square // 2
+        center_x = self.origin_x + visual_file * self.square + self.square // 2
+        center_y = self.origin_y + visual_rank * self.square + self.square // 2
 
         # Find sprite near this position (within half a square)
         for sprite in self.sprites.sprite_list:
@@ -319,8 +418,6 @@ class GameView(arcade.View):
 
         if self.board.checkmate or self.board.stalemate:
             return
-        
-        #Check if white in checkmate
 
         #Handle captures
         piece = self.board.grid[rank][file].piece_here
@@ -334,93 +431,19 @@ class GameView(arcade.View):
 
         # Pawn at end of board (promotion)
         piece = self.board.grid[rank][file].get_piece_here()
-        if (piece and piece.piece_type == PieceType.PAWN and
-                rank == 7 and piece.color == Color.WHITE):
-            print("WHITE PAWN PROMOTED!")
-            piece.promote()
-            self.board.promote(Color.WHITE, file, rank)
-        
+        if piece and piece.piece_type == PieceType.PAWN:
+            if (rank == 7 and piece.color == Color.WHITE) or (rank == 0 and piece.color == Color.BLACK):
+                print(f"{piece.color.name} PAWN PROMOTED!")
+                piece.promote()
+                self.board.promote(piece.color, file, rank)
 
         # Rebuild sprites to show new board state
         self.sprites.build_from_board(
-            self.board, self.square, self.origin_x, self.origin_y
+            self.board, self.square, self.origin_x, self.origin_y, self.game.user_color
         )
 
         # Reset game state
         self.board.print_board()
-        self.game.turn = Color.BLACK
-
-    def move_piece_and_update_bot(self):
-
-        #Prevent playing from old moves
-        if not self.board.is_curr_pos():
-            return
-        
-        #Prevent playing in checkmate or stalemate
-        if self.board.checkmate or self.board.stalemate:
-            return
-        
-        #TODO: update to work various of colors
-        move_list = self.board.get_all_moves(color = Color.BLACK)
-        if len(move_list) == 0:
-            #Stalemate or checkmate
-
-            #Get all player moves
-            all_moves = self.board.get_all_enemy_moves(color = Color.BLACK)
-
-            #Get position of king
-            for rank in range(8):
-                for file in range(8):
-                    piece = self.board.grid[rank][file].piece_here
-
-                    if (piece and piece.color == Color.BLACK and piece.piece_type == PieceType.KING):
-
-                        #If king in moves (checkmate)
-                        if piece.current_pos in all_moves:
-
-                            #Checkmate
-                            print("BLACK is in CHECKMATE")
-                            self.board.set_checkmate()
-                            self.board.set_mate_color(Color.WHITE)
-                            #call function to display that
-                            return
-                        else:
-                            print("BLACK is in STALEMATE")
-                            self.board.set_stalemate()
-                            #call function to display that
-                            return
-
-        
-        """ Moves the bot """
-        # Bot's turn
-        bot_moves = self.bot.next_move(fen=self.board.board_state())
-        self.board.selected_piece = (
-            self.board.grid[bot_moves[0][0]][bot_moves[0][1]].piece_here
-        )
-        self.board.move_piece(bot_moves[1][1], bot_moves[1][0])
-
-        final_rank = bot_moves[1][0]
-        final_file = bot_moves[1][1]
-        piece = self.board.grid[final_rank][final_file].piece_here
-
-        if piece and piece.piece_type == PieceType.PAWN and final_rank == 0 and piece.color == Color.BLACK:
-            print("BLACK PAWN PROMOTED@")
-            piece.promote()
-            self.board.promote(Color.BLACK, final_file, final_rank)
-
-        self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
-        self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
-
-        # Rebuild sprites again after bot move
-        #self.wait()
-        self.sprites.build_from_board(
-            self.board, self.square, self.origin_x, self.origin_y
-        )
-        self.board.grid[bot_moves[0][0]][bot_moves[0][1]].prev_move()
-        self.board.grid[bot_moves[1][0]][bot_moves[1][1]].prev_move()
-
-        # User currently hardcoded as white
-        self.game.turn = Color.WHITE
 
     def on_mouse_motion(self, x, y, dx, dy):
         """
@@ -465,16 +488,17 @@ class GameView(arcade.View):
                     # Valid move
                     self.board.remove_highlights()
                     self.move_piece_and_update_sprites(file, rank)
-                    self.move_piece_and_update_bot()
+                    self.game.turn = self.game.user_color.opposite()
+                    self.make_bot_move()
+                    self.game.turn = self.game.user_color
                 else:
                     # Invalid move - snap back to original position
                     orig_file, orig_rank = self.drag_start_pos
-                    center = self.sprites._tile_center(
-                        self.origin_x, self.origin_y, self.square,
-                        orig_rank, orig_file
-                    )
-                    self.dragging_sprite.center_x = center[0]
-                    self.dragging_sprite.center_y = center[1]
+                    visual_file, visual_rank = self.board_to_screen_coords(orig_file, orig_rank)
+                    center_x = self.origin_x + visual_file * self.square + self.square // 2
+                    center_y = self.origin_y + visual_rank * self.square + self.square // 2
+                    self.dragging_sprite.center_x = center_x
+                    self.dragging_sprite.center_y = center_y
                     self.dragging_sprite = None
                     self.drag_start_pos = None
                     self.drag_offset_x = 0
@@ -484,36 +508,33 @@ class GameView(arcade.View):
             else:
                 # Dropped outside board - snap back
                 orig_file, orig_rank = self.drag_start_pos
-                center = self.sprites._tile_center(
-                    self.origin_x, self.origin_y, self.square,
-                    orig_rank, orig_file
-                )
-                self.dragging_sprite.center_x = center[0]
-                self.dragging_sprite.center_y = center[1]
+                visual_file, visual_rank = self.board_to_screen_coords(orig_file, orig_rank)
+                center_x = self.origin_x + visual_file * self.square + self.square // 2
+                center_y = self.origin_y + visual_rank * self.square + self.square // 2
+                self.dragging_sprite.center_x = center_x
+                self.dragging_sprite.center_y = center_y
                 self.dragging_sprite = None
                 self.drag_start_pos = None
                 self.drag_offset_x = 0
                 self.drag_offset_y = 0
                 return
-        
-        
 
         self.dragging_sprite = None
         self.drag_start_pos = None
         self.drag_offset_x = 0
         self.drag_offset_y = 0
-    
+
     def wait(self):
         """ Function waits a second prior to making bot move """
         counter = 1
         start = time.time()
         while time.time() < start + 2:
             pass
-    
+
     def on_key_press(self, symbol, modifiers):
-        ''' 
+        '''
         Handles reactions to key press events
-        
+
         Args:
             symbol: which key was pressed
             modifiers: active keyboard modifiers
@@ -529,7 +550,7 @@ class GameView(arcade.View):
             self.board.current_index -= 1
             move = self.board.move_history[self.board.current_index]
             self.board.load_fen(move["FEN"])
-            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
+            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y, self.game.user_color)
 
     def show_next_move(self):
         ''' Goes forward one move in history '''
@@ -537,4 +558,4 @@ class GameView(arcade.View):
             self.board.current_index += 1
             move = self.board.move_history[self.board.current_index]
             self.board.load_fen(move["FEN"])
-            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y)
+            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y, self.game.user_color)

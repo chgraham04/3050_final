@@ -58,7 +58,12 @@ class ChessSprites:
             origin_y + rank * square + square / 2,
         )
 
-    def build_from_board(self, board, square: int, origin_x: int, origin_y: int):
+    """
+    Modified build_from_board to accept user_color parameter.
+    This allows sprites to be positioned correctly when board is flipped
+    for BLACK perspective.
+    """
+    def build_from_board(self, board, square: int, origin_x: int, origin_y: int, user_color=None):
         pad: float = 0.88
         self.sprite_list = arcade.SpriteList(use_spatial_hash=True)
         self._by_piece_id.clear()
@@ -76,11 +81,19 @@ class ChessSprites:
 
                 piece = tile.piece_here
 
+                # Convert board coordinates to visual coordinates based on user color
+                if user_color and hasattr(user_color, 'name') and user_color.name == 'BLACK':
+                    visual_file = 7 - file
+                    visual_rank = 7 - rank
+                else:
+                    visual_file = file
+                    visual_rank = rank
+
                 #Checks if piece already has sprite
                 if id(piece) in self._by_piece_id:
                     spr = self._by_piece_id[id(piece)]
                     spr.center_x, spr.center_y = self._tile_center(
-                        origin_x, origin_y, square, rank, file)
+                        origin_x, origin_y, square, visual_rank, visual_file)
 
                 else:
 
@@ -88,13 +101,16 @@ class ChessSprites:
 
                     spr = arcade.Sprite(tex, scale=scale)
                     spr.center_x, spr.center_y = self._tile_center(
-                        origin_x, origin_y, square, rank, file)
+                        origin_x, origin_y, square, visual_rank, visual_file)
                     self.sprite_list.append(spr)
                     self._by_piece_id[id(piece)] = spr
 
-    def sync_from_board(self, board, square: int, origin_x: int, origin_y: int):
+    """
+     sync_from_board now accepts user_color parameter for switching sides
+    """
+    def sync_from_board(self, board, square: int, origin_x: int, origin_y: int, user_color=None):
         pad: float = 0.88
-        self.build_from_board(board, square, origin_x, origin_y)
+        self.build_from_board(board, square, origin_x, origin_y, user_color)
 
         desired_w = square * pad
         scale = desired_w / self.cell_pixel_width
@@ -106,11 +122,19 @@ class ChessSprites:
                     piece = tile.piece_here
 
                     if id(piece) not in self._by_piece_id:
+                        # Convert board coordinates to visual coordinates based on user color
+                        if user_color and hasattr(user_color, 'name') and user_color.name == 'BLACK':
+                            visual_file = 7 - file
+                            visual_rank = 7 - rank
+                        else:
+                            visual_file = file
+                            visual_rank = rank
+
                         tex = self.sheet.get_texture(piece.color, piece.piece_type)
 
                         spr = arcade.Sprite(tex, scale=scale)
                         spr.center_x, spr.center_y = self._tile_center(
-                            origin_x, origin_y, square, rank, file)
+                            origin_x, origin_y, square, visual_rank, visual_file)
                         self.sprite_list.append(spr)
                         self._by_piece_id[id(piece)] = spr
                 else:

@@ -426,10 +426,18 @@ class Board:
             print(row_str)
         print()
 
-    def board_state(self):
+    """
+    Modified board_state to accept optional active_color parameter.
+    Returns full FEN string including turn indicator, castling rights, en passant, etc.
+    If no active_color provided, returns just piece positions (backward compatible).
+    """
+    def board_state(self, active_color: Color = None):
         """
         Generate FEN (Forsyth-Edwards Notation) string of current _board state
 
+        Args:
+            active_color: Optional - Whose turn it is (Color.WHITE or Color.BLACK)
+                         If provided, returns full FEN. If None, returns only positions.
         Returns:
             FEN string representing the _board position
         """
@@ -459,15 +467,37 @@ class Board:
                             fen_row += symbol.lower()
             fen_string += (fen_row + "/")
         fen_string = fen_string[:-1]
-        #print(fen_string)
+
+        # If active_color provided, return full FEN
+        if active_color is not None:
+            # Add turn indicator
+            turn_char = 'w' if active_color == Color.WHITE else 'b'
+
+            # Add castling rights (simplified for now - could be improved)
+            castling = '-'
+
+            # Add en passant target
+            if self.en_passant_target:
+                file_letter = chr(ord('a') + self.en_passant_target[0])
+                rank_number = str(self.en_passant_target[1] + 1)
+                en_passant = f"{file_letter}{rank_number}"
+            else:
+                en_passant = '-'
+
+            # Add halfmove and fullmove counters (simplified)
+            halfmove = 0
+            fullmove = 1
+
+            fen_string = f"{fen_string} {turn_char} {castling} {en_passant} {halfmove} {fullmove}"
+
         return fen_string
-    
+
     def calculate_material(self):
-        ''' 
+        '''
         Calculates the total material balance of the board
-         
+
         Returns:
-            Difference in total white material vs total black material 
+            Difference in total white material vs total black material
         '''
         white_total = 0
         black_total = 0
@@ -487,13 +517,13 @@ class Board:
                     black_total += value
 
         return white_total - black_total
-    
+
     def load_fen(self, fen):
-        ''' 
+        '''
         Reset the board to the position described by a FEN string
-        
+
         Args:
-            fen: fen representation of board layout      
+            fen: fen representation of board layout
         '''
 
         for file in range(8):
@@ -504,7 +534,7 @@ class Board:
 
                 #Recreate the tiles
                 self.grid[rank][file] = Tile(file, rank, is_light)
-        
+
         #Split fen string apart per row
         rank_rows = fen.split('/')
 
@@ -516,7 +546,7 @@ class Board:
             for char in row:
                 if char.isdigit():
                     file_index += int(char)
-                
+
                 #If not digit, there is a piece here
                 else:
                     color = Color.WHITE if char.isupper() else Color.BLACK
@@ -538,7 +568,7 @@ class Board:
                     if isinstance(piece, Pawn):
                         if (piece.color == Color.WHITE and rank_index != 1) or (piece.color == Color.BLACK and rank_index != 6):
                             piece.has_moved = True
-                    
+
                     #TODO - implement has_moved for rook and king as well
 
                     self.grid[rank_index][file_index].piece_here = piece
@@ -556,14 +586,13 @@ class Board:
     def is_curr_pos(self):
         """ Check if board displays current move """
         return self.current_index == len(self.move_history) - 1
-    
+
     def promote(self, color, file, rank):
-        """ 
+        """
         Create a new instance of a queen wherever a pawn is promoted
-        
+
         Args:
             Rank: the rank of the pawn/queen
             File: the file of the pawn/queen
         """
         self.grid[rank][file].piece_here = Queen(color, (file, rank))
-
