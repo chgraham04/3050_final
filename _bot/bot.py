@@ -14,6 +14,10 @@ class Bot:
         self.stockfish = Stockfish(path=stockfish_path, parameters={"Skill Level": 1})
         self.color = Color.BLACK
 
+    def set_elo(self, elo: int):
+        stockfish_path = import_stockfish()
+        self.stockfish = Stockfish(path=stockfish_path, parameters={"UCI_Elo": elo, "Skill Level": 10})
+
     def next_move(self, fen: str) -> list[tuple[int, int]]:
         """Get the next move coordinates from Stockfish"""
         files = {"a": 0, "b": 1, "c": 2,
@@ -27,7 +31,9 @@ class Bot:
         start_rank = best_move[1]
         move_to_file = files[best_move[2]]
         move_to_rank = best_move[3]
+        print(self.stockfish.get_parameters())
         return [(int(start_rank) - 1, start_file), (int(move_to_rank) - 1, move_to_file)]
+
 
     def make_move(self, board, bot_color: Color) -> tuple[tuple[int, int], tuple[int, int]] | None:
         """

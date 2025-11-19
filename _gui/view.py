@@ -11,6 +11,10 @@ from _enums.piece_type import PieceType
 from _assets.spritesheet import Spritesheet, ChessSprites
 from _game.game import Game
 from _bot.bot import Bot
+import arcade.gui
+import arcade.gui.widgets.layout
+import arcade.gui.widgets.buttons
+from arcade.gui import UIManager, UIFlatButton
 
 LIGHT_SQ = (240, 217, 181)
 DARK_SQ = (181, 136, 99)
@@ -133,6 +137,8 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
     arcade.draw_text(button_text, x + width // 2, button_y + button_height // 2,
                      button_text_color, 12, anchor_x="center", anchor_y="center", bold=True)
 
+
+
 class GameView(arcade.View):
     """
     Main game view handling rendering and user interaction.
@@ -182,6 +188,101 @@ class GameView(arcade.View):
         """
         self.game_started = False
 
+        self.manager = UIManager()
+        self.manager.enable()
+
+
+        # Difficulty Buttons
+        easy_style = {
+            # You should provide a style for each widget state
+            "normal": UIFlatButton.UIStyle(
+                bg=arcade.color.APPLE_GREEN,
+                font_color=arcade.color.BLACK),  # use default values for `normal` state
+            "hover": UIFlatButton.UIStyle(
+                font_color=arcade.color.BLACK,
+                bg=arcade.color.AO,
+            ),
+            "press": UIFlatButton.UIStyle(
+                font_color=arcade.color.BLACK,
+                bg=arcade.color.WHITE,
+                border=arcade.color.WHITE,
+            ),
+            "disabled": UIFlatButton.UIStyle(
+                bg=arcade.color.GRAY,
+            )
+        }
+        medium_style = {
+            # You should provide a style for each widget state
+            "normal": UIFlatButton.UIStyle(
+                bg=arcade.color.AUREOLIN,
+                font_color=arcade.color.BLACK),  # use default values for `normal` state
+            "hover": UIFlatButton.UIStyle(
+                font_color=arcade.color.BLACK,
+                bg=arcade.color.AMBER,
+            ),
+            "press": UIFlatButton.UIStyle(
+                font_color=arcade.color.BLACK,
+                bg=arcade.color.WHITE,
+                border=arcade.color.WHITE,
+            ),
+            "disabled": UIFlatButton.UIStyle(
+                bg=arcade.color.GRAY,
+            )
+        }
+        hard_style = {
+            # You should provide a style for each widget state
+            "normal": UIFlatButton.UIStyle(
+                bg=arcade.color.AMERICAN_ROSE,
+                font_color=arcade.color.BLACK),  # use default values for `normal` state
+            "hover": UIFlatButton.UIStyle(
+                font_color=arcade.color.BLACK,
+                bg=arcade.color.ALABAMA_CRIMSON,
+            ),
+            "press": UIFlatButton.UIStyle(
+                font_color=arcade.color.BLACK,
+                bg=arcade.color.WHITE,
+                border=arcade.color.WHITE,
+            ),
+            "disabled": UIFlatButton.UIStyle(
+                bg=arcade.color.GRAY,
+            )
+        }
+        self.easy = UIFlatButton(text="EASY", width=120,style=easy_style)
+        self.easy.center_x = 980
+
+
+
+        self.easy.center_y = 650
+        self.manager.add(self.easy)
+
+        @self.easy.event("on_click")
+        def on_click_settings(event):
+            print("EASY")
+            self.bot.set_elo(400)
+
+        self.medium = UIFlatButton(text="MEDIUM", width=120, style = medium_style)
+        self.medium.center_x = 980
+
+        self.medium.center_y = 600
+        self.manager.add(self.medium)
+
+        @self.medium.event("on_click")
+        def on_click_settings(event):
+            print("MEDIUM")
+            self.bot.set_elo(800)
+
+        self.hard = UIFlatButton(text="HARD", width=120, style = hard_style)
+        self.hard.center_x = 980
+
+        self.hard.center_y = 550
+        self.manager.add(self.hard)
+
+        @self.hard.event("on_click")
+        def on_click_settings(event):
+            print("HARD")
+            self.bot.set_elo(1400)
+
+
     def screen_to_board_coords(self, visual_file: int, visual_rank: int) -> tuple[int, int]:
         """
         Convert visual screen coordinates to actual board coordinates.
@@ -217,6 +318,7 @@ class GameView(arcade.View):
         self.sprites.draw()
         draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
                        self.window.height, self.game, self.board)
+        self.manager.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         """
