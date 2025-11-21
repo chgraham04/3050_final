@@ -18,8 +18,10 @@ import arcade.gui.widgets.layout
 import arcade.gui.widgets.buttons
 from arcade.gui import UIManager, UIFlatButton
 
-LIGHT_SQ = (240, 217, 181)
-DARK_SQ = (181, 136, 99)
+#LIGHT_SQ = (240, 217, 181)
+#DARK_SQ = (181, 136, 99)
+LIGHT_SQ = (230, 225, 210)  
+DARK_SQ = (200, 190, 170)
 HIGHLIGHT_SQ = (118, 150, 86)
 PREV_SQ = (125, 135, 150)
 SIDEPANEL_BG = (50, 50, 50)
@@ -37,6 +39,10 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int, user_col
         square: Size of each square in pixels
         user_color: The color the user is playing (affects board orientation)
     """
+
+    BORDER_1 = 0.07
+    BORDER_2 = 0.14
+
     for rank in range(8):
         for file in range(8):
             # Transform coordinates based on user color
@@ -50,17 +56,40 @@ def draw_board(board: Board, origin_x: int, origin_y: int, square: int, user_col
             x = origin_x + visual_file * square
             y = origin_y + visual_rank * square
             fill = LIGHT_SQ if board.grid[rank][file].is_light_square else DARK_SQ
+            alt = DARK_SQ if fill == LIGHT_SQ else LIGHT_SQ
+
+            inner_1 = square * BORDER_1
+            inner_2 = square * BORDER_2
 
             if board.grid[rank][file].prev:
-                fill = PREV_SQ
+                #arcade.draw_lbwh_rectangle_filled(x, y, square, square, PREV_SQ)
+                alt = PREV_SQ
 
             if board.grid[rank][file].highlighted:
-                fill = HIGHLIGHT_SQ
+                #arcade.draw_lbwh_rectangle_filled(x, y, square, square, HIGHLIGHT_SQ)
+                alt = HIGHLIGHT_SQ
 
             if board.grid[rank][file].clicked:
-                fill = CLICK_SQ
-
+                #arcade.draw_lbwh_rectangle_filled(x, y, square, square, CLICK_SQ)
+                alt = CLICK_SQ
+            
             arcade.draw_lbwh_rectangle_filled(x, y, square, square, fill)
+
+            #MIDDLE SQUARE
+            arcade.draw_lbwh_rectangle_filled(
+                x + inner_1, y + inner_1,
+                square - 2 * inner_1, square - 2 * inner_1, 
+                alt
+            )
+
+            #INNER SQUARE
+            arcade.draw_lbwh_rectangle_filled(
+                x + inner_2, y + inner_2,
+                square - 2 * inner_2, square - 2 * inner_2,
+                fill
+            )
+
+            
 
 
 def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: Board):
