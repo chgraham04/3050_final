@@ -11,6 +11,8 @@ from _enums.piece_type import PieceType
 from _assets.spritesheet import Spritesheet, ChessSprites
 from _game.game import Game
 from _bot.bot import Bot
+from pyglet.math import Vec2
+from arcade.experimental.crt_filter import CRTFilter
 import arcade.gui
 import arcade.gui.widgets.layout
 import arcade.gui.widgets.buttons
@@ -136,6 +138,7 @@ def draw_sidepanel(x: int, y: int, width: int, height: int, game: Game, board: B
     arcade.draw_lbwh_rectangle_outline(button_x, button_y, button_width, button_height, C.GRAY, 2)
     arcade.draw_text(button_text, x + width // 2, button_y + button_height // 2,
                      button_text_color, 12, anchor_x="center", anchor_y="center", bold=True)
+    
 
 
 
@@ -155,6 +158,16 @@ class GameView(arcade.View):
             title: Window title (unused but required by parent)
         """
         super().__init__()
+        self.crt_filter = CRTFilter(self.window.width, self.window.height,
+                                    resolution_down_scale=1.0,
+                                    hard_scan=-2.0,
+                                    hard_pix=-2.0,
+                                    display_warp = Vec2(0.0, 0.0),
+                                    mask_dark=0.5,
+                                    mask_light=1.2)
+        
+        self.filter_on = False
+
         arcade.set_background_color(C.CADET_BLUE)
         self.window.set_caption(title)
 
@@ -281,6 +294,39 @@ class GameView(arcade.View):
         def on_click_settings(event):
             print("HARD")
             self.bot.set_elo(1400)
+        
+        # ================ THEME BUTTONS ======================
+        #Theme change buttons
+        theme_button_style = {
+            "normal": UIFlatButton.UIStyle(bg = arcade.color.ROYAL_BLUE, font_color=arcade.color.WHITE),
+            "hover": UIFlatButton.UIStyle(bg = arcade.color.BLUE_BELL, font_color=arcade.color.WHITE),
+            "press": UIFlatButton.UIStyle(bg = arcade.color.NAVY_BLUE, font_color=arcade.color.WHITE),
+        }
+
+        #White theme button
+        self.white_theme_button = UIFlatButton(text="Change WHITE Theme", width=180, style=theme_button_style)
+        self.white_theme_button.center_x = 980
+        self.white_theme_button.center_y = 480
+        self.manager.add(self.white_theme_button)
+
+        @self.white_theme_button.event("on_click")
+        def _white_theme(event):
+            print("Changing WHITE Theme")
+            self.sheet.next_white_theme()
+            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y, self.game.user_color)
+        
+        #Black theme button
+        self.black_theme_button = UIFlatButton(text="Change BLACK Theme", width=180, style=theme_button_style)
+        self.black_theme_button.center_x = 980
+        self.black_theme_button.center_y = 430
+        self.manager.add(self.black_theme_button)
+
+        @self.black_theme_button.event("on_click")
+        def _black_theme(event):
+            print("Changing BLACK Theme")
+            self.sheet.next_black_theme()
+            self.sprites.build_from_board(self.board, self.square, self.origin_x, self.origin_y, self.game.user_color)
+
 
 
     def screen_to_board_coords(self, visual_file: int, visual_rank: int) -> tuple[int, int]:
@@ -312,13 +358,34 @@ class GameView(arcade.View):
         return (board_file, board_rank)
 
     def on_draw(self):
-        """ Draw the game board, pieces, and side panel """
-        self.clear()
-        draw_board(self.board, self.origin_x, self.origin_y, self.square, self.game.user_color)
-        self.sprites.draw()
-        draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
-                       self.window.height, self.game, self.board)
-        self.manager.draw()
+        if self.filter_on:
+                # Draw our stuff into the CRT filter
+                self.crt_filter.use()
+                self.crt_filter.clear()
+                # Switch back to our window and draw the CRT filter do
+                # draw its stuff to the screen
+                draw_board(self.board, self.origin_x, self.origin_y, self.square, self.game.user_color)
+                self.sprites.draw()
+                draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width,
+                            self.window.height, self.game, self.board)
+                self.manager.draw()
+
+                self.window.use()
+                self.clear()
+
+
+                # draw stretched
+                self.crt_filter.draw()
+                
+        else:
+            self.clear()
+            draw_board(self.board, self.origin_x, self.origin_y, self.square, self.game.user_color)
+            self.sprites.draw()
+            draw_sidepanel(self.sidepanel_x, 0, self.sidepanel_width, self.window.height, self.game, self.board)
+            self.manager.draw()
+
+
+
 
     def on_mouse_press(self, x, y, button, modifiers):
         """
@@ -598,7 +665,7 @@ class GameView(arcade.View):
                     orig_file, orig_rank = self.drag_start_pos
                     visual_file, visual_rank = self.board_to_screen_coords(orig_file, orig_rank)
                     center_x = self.origin_x + visual_file * self.square + self.square // 2
-                    center_y = self.origin_y + visual_rank * self.square + self.square // 2
+                    center_y = self.origin_y + visual_rank * self.square + self.square // 1.5
                     self.dragging_sprite.center_x = center_x
                     self.dragging_sprite.center_y = center_y
                     self.dragging_sprite = None

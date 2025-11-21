@@ -11,12 +11,12 @@ class Bot:
             raise FileNotFoundError("Could not find or download Stockfish executable")
 
         print(f"Using Stockfish at: {stockfish_path}")
-        self.stockfish = Stockfish(path=stockfish_path, parameters={"Skill Level": 1})
+        self.stockfish = Stockfish(path=stockfish_path, parameters={"UCI_Elo": 100})
         self.color = Color.BLACK
 
     def set_elo(self, elo: int):
         stockfish_path = import_stockfish()
-        self.stockfish = Stockfish(path=stockfish_path, parameters={"UCI_Elo": elo, "Skill Level": 10})
+        self.stockfish = Stockfish(path=stockfish_path, parameters={"UCI_Elo": elo})
 
     def next_move(self, fen: str) -> list[tuple[int, int]]:
         """Get the next move coordinates from Stockfish"""

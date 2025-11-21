@@ -12,25 +12,41 @@ class Spritesheet:
     Simplified spritesheet loader for 12 unique PNGs.
     Loads textures from _assets/_sprites/ and provides them via get_texture().
     """
-    def __init__(self, sprites_dir: str = "_assets/_sprites"):
+    def __init__(self, sprites_dir: str = "_assets/_sprites", themes: int = 3):
         base_dir = os.path.dirname(__file__)
         self.dir = os.path.normpath(os.path.join(base_dir, "..", sprites_dir))
-        self._textures: Dict[Tuple[str, str], arcade.Texture] = {}
+        
+        self.themes = themes
+        self.white_theme = 1
+        self.black_theme = 1
+        
+        self._textures: Dict[Tuple[str, str, int], arcade.Texture] = {}
         self._load_textures()
 
     def __repr__(self):
         return "_assets/_sprites"
 
     def _load_textures(self):
-        for color in color_names:
-            for piece in piece_names:
-                filename = f"{color}_{piece}.png"
-                full_path = os.path.join(self.dir, filename)
-                if not os.path.exists(full_path):
-                    raise FileNotFoundError(f"Missing sprite image: {full_path}")
-                tex = arcade.load_texture(full_path)
-                self._textures[(color.upper(), piece.upper())] = tex
+        for theme in range(1, self.themes + 1):
+            for color in color_names:
+                for piece in piece_names:
+                    filename = f"{color}_{piece}_{theme}.png"
+                    full_path = os.path.join(self.dir, filename)
+                    if not os.path.exists(full_path):
+                        raise FileNotFoundError(f"Missing sprite image: {full_path}")
+                    tex = arcade.load_texture(full_path)
+                    self._textures[(color.upper(), piece.upper(), theme)] = tex
         print(f"[Spritesheet] Loaded {len(self._textures)} piece textures successfully.")
+    
+    def next_white_theme(self):
+        self.white_theme = (self.white_theme % self.themes) + 1
+    
+    def next_black_theme(self):
+        self.black_theme = (self.black_theme % self.themes) + 1
+
+    def set_theme(self, theme_number: int):
+        """Switch active theme of pieces"""
+        self.current_theme = theme_number
 
     def get_texture(self, color, piece_type) -> arcade.Texture:
         """
@@ -39,7 +55,8 @@ class Spritesheet:
         """
         color_name = getattr(color, "name", str(color)).upper()
         piece_name = getattr(piece_type, "name", str(piece_type)).upper()
-        return self._textures[(color_name, piece_name)]
+        theme = self.white_theme if color_name == "WHITE" else self.black_theme
+        return self._textures[(color_name, piece_name, theme)]
 
 
 class ChessSprites:
@@ -55,7 +72,7 @@ class ChessSprites:
                       rank: int, file: int) -> tuple[float, float]:
         return (
             origin_x + file * square + square / 2,
-            origin_y + rank * square + square / 2,
+            origin_y + rank * square + square / 1.5,
         )
 
     """
@@ -149,3 +166,10 @@ class ChessSprites:
         if sprite:
             self._by_piece_id.pop(id(piece))
             self.sprite_list.remove(sprite)
+
+    def reload_theme(self, board, square, origin_x, origin_y, user_color=None):
+        """ 
+        Rebuilds all sprites when theme is changed
+        """
+
+        self.build_from_board(board, square, origin_x, origin_y, user_color)
