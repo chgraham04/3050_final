@@ -50,30 +50,6 @@ class Bot:
         if not board.is_curr_pos() or board.checkmate or board.stalemate:
             return None
 
-        # Get all legal moves
-        move_list = board.get_all_moves(color=bot_color)
-
-        # Check for checkmate or stalemate
-        if len(move_list) == 0:
-            all_moves = board.get_all_enemy_moves(color=bot_color)
-
-            for rank in range(8):
-                for file in range(8):
-                    piece = board.grid[rank][file].piece_here
-
-                    if (piece and piece.color == bot_color and
-                            piece.piece_type == PieceType.KING):
-
-                        if piece.current_pos in all_moves:
-                            print(f"{bot_color.name} is in CHECKMATE")
-                            board.set_checkmate()
-                            board.set_mate_color(bot_color.opposite())
-                            return None
-                        else:
-                            print(f"{bot_color.name} is in STALEMATE")
-                            board.set_stalemate()
-                            return None
-
         # Get best move from Stockfish
         bot_moves = self.next_move(fen=board.board_state(active_color=bot_color))
         from_pos = bot_moves[0]

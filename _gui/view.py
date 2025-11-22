@@ -499,6 +499,12 @@ class GameView(arcade.View):
                                     print(f"{self.game.user_color.name} is in STALEMATE")
                                     self.board.set_stalemate()
                                     return
+                    
+                    #Check for draws
+                    if self.board.check_draw():
+                        print(f"Stalemate")
+                        self.board.set_stalemate()
+                        return
 
                     # Start dragging the sprite
                     sprite = self.get_sprite_at_position(file, rank)
@@ -548,6 +554,38 @@ class GameView(arcade.View):
     def make_bot_move(self):
         """Make the bot's move and update the display"""
         bot_color = self.game.user_color.opposite()
+        # Check if we can make a move
+        if not self.board.is_curr_pos() or self.board.checkmate or self.board.stalemate:
+            return None
+
+        # Get all legal moves
+        move_list = self.board.get_all_moves(color=bot_color)
+
+        # Check for checkmate or stalemate
+        if len(move_list) == 0:
+            all_moves = self.board.get_all_enemy_moves(color=bot_color)
+
+            for rank in range(8):
+                for file in range(8):
+                    piece = self.board.grid[rank][file].piece_here
+
+                    if (piece and piece.color == bot_color and
+                            piece.piece_type == PieceType.KING):
+
+                        if piece.current_pos in all_moves:
+                            print(f"{bot_color.name} is in CHECKMATE")
+                            self.board.set_checkmate()
+                            self.board.set_mate_color(bot_color.opposite())
+                            return None
+                        else:
+                            print(f"{bot_color.name} is in STALEMATE")
+                            self.board.set_stalemate()
+                            return None
+        
+        if self.board.check_draw():
+            print(f"stalemate from not enough pieces!")
+            self.board.set_stalemate()
+            return None
         move = self.bot.make_move(self.board, bot_color)
 
         if move:
