@@ -408,6 +408,43 @@ class Board:
 
         self.en_passant_target = None
 
+    def resign(self, resigning_color: Color):
+        """
+        Handle player resignation
+
+        Args:
+            resigning_color: The color of the player who is resigning
+        """
+        self.checkmate = True
+        # Winner is the opposite color
+        self.mate_color = resigning_color.opposite()
+        print(f"{resigning_color.name} resigned. {self.mate_color.name} wins!")
+
+    def reset_board(self):
+        """
+        Reset the board to the initial starting position
+        """
+        # Clear all tiles
+        for rank in range(8):
+            for file in range(8):
+                is_light = (file + rank) % 2 == 1
+                self.grid[rank][file] = Tile(file, rank, is_light)
+
+        # Reset board state
+        self.selected_piece = None
+        self.checking_for_checks = False
+        self.en_passant_target = None
+        self.move_history = []
+        self.current_index = -1
+        self.material_differential = 0
+        self.checkmate = False
+        self.stalemate = False
+        self.mate_color = None
+
+        # reinitialize pieces to starting positions
+        self.initialize_pieces()
+        print("Board reset to starting position")
+
     def print_board(self):
         """Print a text representation of the _board to console (testing)"""
         for rank in range(7, -1, -1):  # print rank 8 down to 1
