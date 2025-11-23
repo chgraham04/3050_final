@@ -633,3 +633,29 @@ class Board:
             File: the file of the pawn/queen
         """
         self.grid[rank][file].piece_here = Queen(color, (file, rank))
+
+    def check_draw(self):
+        """
+        Check to see if enough pieces are left on the board to complete a checkmate; if not, sets draw to true.
+        """
+        piece_count = 0
+
+        #If more than four pieces on the board, checkmate is possible
+        # (bishop/knight and king in each color invalidate checkmate)
+        for rank in range(8):
+            for file in range(8):
+                piece = self.grid[rank][file].piece_here
+                if piece:
+
+                    piece_count += 1
+
+                    if (piece.piece_type == PieceType.ROOK or
+                        piece.piece_type == PieceType.QUEEN or 
+                        piece.piece_type == PieceType.PAWN):
+
+                        return 0
+                
+        if piece_count <= 4:
+            return 1
+
+        
